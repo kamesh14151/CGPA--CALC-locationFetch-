@@ -3,228 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AJ STUDIOZ - CGPA & Details</title>
+<title>AJ STUDIOZ | Home</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root { --primary:#6a11cb; --secondary:#2575fc; --dark:#100721; --text-primary:#fff; }
-body{font-family:'Poppins',sans-serif; background:linear-gradient(135deg,var(--dark),#1a1a2e); color:var(--text-primary); min-height:100vh; padding:20px;}
-.container{max-width:900px; margin:0 auto; background: rgba(16,7,33,0.6); padding:25px; border-radius:20px; backdrop-filter: blur(20px); border:1px solid rgba(255,255,255,0.15);}
-h1{text-align:center; margin-bottom:15px;}
-.section{display:none;}
-.active{display:block;}
-.options{display:flex; gap:2rem; justify-content:center; flex-wrap:wrap;}
-.option-card{background: rgba(255,255,255,0.1); border-radius:15px; padding:2rem; width:300px; cursor:pointer; transition: all 0.3s ease; border:2px solid transparent;}
-.option-card:hover{transform: translateY(-5px); background: rgba(255,255,255,0.15); border-color: var(--secondary);}
-.option-card i{font-size:3rem; margin-bottom:1rem; color: var(--secondary);}
-.option-card h2{margin-bottom:0.5rem;}
-.option-card p{color: rgba(255,255,255,0.7); font-size:0.9rem;}
-.sem-input{margin:10px 0; display:flex; justify-content:space-between; align-items:center;}
-.sem-input input{width:60px; padding:8px; border-radius:8px; border:1px solid #ccc;}
-button{width:100%; padding:12px; border:none; border-radius:10px; background:var(--secondary); color:#fff; font-weight:bold; cursor:pointer; margin-top:10px; transition:0.3s;}
-button:hover{background:var(--primary);}
-.result{margin-top:20px; font-size:1.2rem; font-weight:bold; text-align:center;}
-.loader{display:none; margin:10px 0; text-align:center;}
-.loader span{display:inline-block;width:24px;height:24px;border:4px solid #0d47a1;border-top:4px solid transparent;border-radius:50%; animation:spin 1s linear infinite;}
-.success-message{color:#4CAF50; margin-top:10px; text-align:center; font-weight:500; display:none;}
-.entry { background: rgba(255,255,255,0.1); padding:10px 15px; margin:10px 0; border-radius:12px; cursor:pointer; transition:0.3s; }
-.entry:hover { background: rgba(255,255,255,0.2); }
-.entry p { margin:3px 0; font-size:0.95rem; }
-/* Modal */
-.modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.7); }
-.modal-content { background: rgba(16,7,33,0.95); margin:5% auto; padding:20px; border-radius:12px; max-width:650px; color:#fff; position:relative; }
-.close { position:absolute; top:10px; right:15px; font-size:24px; font-weight:bold; cursor:pointer; }
-#modalMap { width:100%; height:350px; margin-top:15px; border-radius:12px; }
-.map-toggle { margin-top:10px; text-align:center; }
-.map-toggle button { padding:8px 12px; margin:0 5px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; transition:0.3s;}
-.map-toggle button:hover{opacity:0.8;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-@media (max-width:700px){ .modal-content{width:90%;} #modalMap{height:250px;} }
+:root { --primary: #6a11cb; --secondary: #2575fc; --dark: #100721; --text-primary: #fff; }
+body { font-family:'Poppins',sans-serif; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:linear-gradient(135deg,var(--dark),#1a1a2e); color:var(--text-primary); min-height:100vh; }
+.container { max-width:800px; padding:2rem; background:rgba(16,7,33,0.6); backdrop-filter:blur(20px); border-radius:20px; box-shadow:0 15px 35px rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.15);}
+h1 { font-size:2.5rem; background:linear-gradient(90deg,#fff,#c9d6ff); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:1rem;}
+.brand { font-size:1rem; color: rgba(255,255,255,0.8); margin-bottom:2rem; }
+.options { display:flex; gap:2rem; justify-content:center; margin-top:3rem; flex-wrap:wrap;}
+.option-card { background: rgba(255,255,255,0.1); border-radius:15px; padding:2rem; width:300px; cursor:pointer; transition:all 0.3s ease; border:2px solid transparent;}
+.option-card:hover { transform:translateY(-5px); background: rgba(255,255,255,0.15); border-color: var(--secondary);}
+.option-card i { font-size:3rem; margin-bottom:1rem; color: var(--secondary);}
+.option-card h2 { margin-bottom:0.5rem;}
+.option-card p { color: rgba(255,255,255,0.7); font-size:0.9rem;}
 </style>
 </head>
 <body>
-
 <div class="container">
-
-  <!-- Home Section -->
-  <div id="homeSection" class="section active">
     <h1>AJ STUDIOZ</h1>
+    <div class="brand">Powered by AJ COMPANY</div>
     <div class="options">
-      <div class="option-card" onclick="showSection('calculatorSection')">
-        <i class="fas fa-calculator"></i>
-        <h2>CGPA Calculator</h2>
-        <p>Calculate your semester GPA and overall CGPA</p>
-      </div>
-      <div class="option-card" onclick="showSection('detailsSection')">
-        <i class="fas fa-network-wired"></i>
-        <h2>View Details</h2>
-        <p>View shared device information including IP & location</p>
-      </div>
+        <div class="option-card" onclick="window.location.href='calculator.html'">
+            <i class="fas fa-calculator"></i>
+            <h2>CGPA Calculator</h2>
+            <p>Calculate your semester GPA and overall CGPA with our easy-to-use calculator</p>
+        </div>
+        <div class="option-card" onclick="window.location.href='details.html'">
+            <i class="fas fa-network-wired"></i>
+            <h2>View Details</h2>
+            <p>View your connection information including IP address and location details</p>
+        </div>
     </div>
-  </div>
-
-  <!-- CGPA Calculator Section -->
-  <div id="calculatorSection" class="section">
-    <h1>CGPA Calculator</h1>
-    <div id="semesters">
-      <div class="sem-input">Semester 1: <input type="number" min="0" max="10" step="0.01" id="sem1"></div>
-      <div class="sem-input">Semester 2: <input type="number" min="0" max="10" step="0.01" id="sem2"></div>
-      <div class="sem-input">Semester 3: <input type="number" min="0" max="10" step="0.01" id="sem3"></div>
-      <div class="sem-input">Semester 4: <input type="number" min="0" max="10" step="0.01" id="sem4"></div>
-      <div class="sem-input">Semester 5: <input type="number" min="0" max="10" step="0.01" id="sem5"></div>
-      <div class="sem-input">Semester 6: <input type="number" min="0" max="10" step="0.01" id="sem6"></div>
-      <div class="sem-input">Semester 7: <input type="number" min="0" max="10" step="0.01" id="sem7"></div>
-      <div class="sem-input">Semester 8: <input type="number" min="0" max="10" step="0.01" id="sem8"></div>
-    </div>
-    <button id="calcShareBtn">Calculate CGPA</button>
-    <div class="result" id="cgpaResult"></div>
-    <div class="success-message" id="successMessage">CGPA calculated successfully!</div>
-    <div class="loader" id="loader"><span></span></div>
-  </div>
-
-  <!-- Details Section -->
-  <div id="detailsSection" class="section">
-    <h1>Shared Device & CGPA Details</h1>
-    <div class="loader" id="loaderDetails"><span></span></div>
-    <div id="entries"></div>
-  </div>
-
 </div>
-
-<!-- Modal -->
-<div id="detailModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
-    <div id="modalDetails"></div>
-    <div class="map-toggle">
-      <button id="streetBtn">Street View</button>
-      <button id="satBtn">Satellite View</button>
-    </div>
-    <div id="modalMap"></div>
-  </div>
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag",
-  authDomain: "livelocationtracker-bcd3d.firebaseapp.com",
-  databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "livelocationtracker-bcd3d",
-  storageBucket: "livelocationtracker-bcd3d.appspot.com",
-  messagingSenderId: "800051113276",
-  appId: "1:800051113276:web:61f0162a9e95aba9cb4239"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// Section handling
-function showSection(id){ 
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ----------------- Calculator -----------------
-const calcShareBtn = document.getElementById("calcShareBtn");
-const cgpaResult = document.getElementById("cgpaResult");
-const loader = document.getElementById("loader");
-const successMessage = document.getElementById("successMessage");
-
-calcShareBtn.addEventListener("click", () => {
-  let total=0,count=0;
-  for(let i=1;i<=8;i++){
-    const val=parseFloat(document.getElementById(`sem${i}`).value);
-    if(!isNaN(val)){ total+=val; count++; }
-  }
-  if(count===0){ alert("Enter at least one semester"); return; }
-  const cgpa=(total/count).toFixed(2);
-  cgpaResult.textContent=`Your CGPA is: ${cgpa}`;
-
-  const device = /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop/Laptop";
-  loader.style.display="block"; successMessage.style.display="none";
-
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{
-      const lat=pos.coords.latitude;
-      const lon=pos.coords.longitude;
-      fetch("https://ipapi.co/json/").then(res=>res.json()).then(data=>{
-        const ip=data.ip||"N/A";
-        const city=data.city||"N/A";
-        const region=data.region||"";
-        const country=data.country_name||"";
-        const isp=data.org||"N/A";
-        const key=ip+"_"+Date.now();
-        update(ref(db,"locations/"+key),{device,ip,city,region,country,isp,cgpa,lat,lon,timestamp:Date.now()});
-        loader.style.display="none"; successMessage.style.display="block";
-      }).catch(()=>{ loader.style.display="none"; successMessage.style.display="block"; });
-    },()=>{ loader.style.display="none"; successMessage.style.display="block"; }, {enableHighAccuracy:true});
-  } else { loader.style.display="none"; successMessage.style.display="block"; }
-});
-
-// ----------------- Details -----------------
-const entriesDiv = document.getElementById("entries");
-const loaderDetails = document.getElementById("loaderDetails");
-
-// Modal elements
-const modal = document.getElementById("detailModal");
-const closeModal = document.getElementById("closeModal");
-const modalDetails = document.getElementById("modalDetails");
-const modalMapDiv = document.getElementById("modalMap");
-const streetBtn = document.getElementById("streetBtn");
-const satBtn = document.getElementById("satBtn");
-
-let modalMap, modalMarker, currentLayer;
-
-closeModal.onclick = ()=>{ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} }
-window.onclick = (e)=>{ if(e.target==modal){ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} } }
-
-const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OSM'});
-const satLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{subdomains:['mt0','mt1','mt2','mt3']});
-
-streetBtn.onclick=()=>{ if(modalMap && streetLayer){modalMap.addLayer(streetLayer); if(currentLayer) modalMap.removeLayer(currentLayer); currentLayer=streetLayer;} }
-satBtn.onclick=()=>{ if(modalMap && satLayer){modalMap.addLayer(satLayer); if(currentLayer) modalMap.removeLayer(currentLayer); currentLayer=satLayer;} }
-
-function renderEntries(data){
-  entriesDiv.innerHTML="";
-  Object.keys(data).sort((a,b)=>b.localeCompare(a)).forEach(k=>{
-    const d = data[k];
-    const entryDiv = document.createElement("div");
-    entryDiv.className="entry";
-    entryDiv.innerHTML = `<p><strong>Device:</strong> ${d.device}</p>
-                          <p><strong>IP:</strong> ${d.ip}</p>
-                          <p><strong>City:</strong> ${d.city}</p>
-                          <p><strong>Region:</strong> ${d.region}</p>
-                          <p><strong>Country:</strong> ${d.country}</p>
-                          <p><strong>ISP:</strong> ${d.isp}</p>
-                          <p><strong>CGPA:</strong> ${d.cgpa || "N/A"}</p>
-                          <p><strong>Timestamp:</strong> ${new Date(d.timestamp).toLocaleString()}</p>`;
-    entryDiv.onclick = ()=>{
-      modalDetails.innerHTML = entryDiv.innerHTML;
-      modal.style.display="block";
-      setTimeout(()=>{
-        if(modalMap){ modalMap.remove(); modalMap=null; }
-        modalMap = L.map('modalMap',{zoomControl:true,scrollWheelZoom:true});
-        currentLayer = streetLayer;
-        modalMap.addLayer(streetLayer);
-        modalMarker = L.marker([d.lat,d.lon]).addTo(modalMap).bindPopup("User Location").openPopup();
-        modalMap.setView([d.lat,d.lon],13);
-      },100);
-    }
-    entriesDiv.appendChild(entryDiv);
-  });
-}
-
-onValue(ref(db,"locations/"), snapshot=>{
-  loaderDetails.style.display="none";
-  if(snapshot.exists()){ renderEntries(snapshot.val()); }
-});
-</script>
-
 </body>
 </html>
+

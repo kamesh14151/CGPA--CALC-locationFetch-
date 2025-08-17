@@ -27,7 +27,6 @@
   --border-radius-small: 8px;
   --font-family: 'Poppins', sans-serif;
 }
-
 body.light-theme {
   --bg-gradient-start: #e9eef2;
   --bg-gradient-end: #fafcff;
@@ -38,51 +37,13 @@ body.light-theme {
   --header-bg: rgba(0, 0, 0, 0.05);
   --row-hover-bg: rgba(0, 0, 0, 0.1);
 }
-
-body {
-  font-family: var(--font-family);
-  margin: 0;
-  padding: 20px;
-  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-  color: var(--text-color);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  transition: background 0.5s ease, color 0.5s ease;
-}
-
-.container {
-  width: 100%;
-  max-width: 900px;
-  background: var(--container-bg);
-  padding: 20px;
-  border-radius: var(--border-radius-main);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: background 0.5s ease, border 0.5s ease;
-}
-
-.header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: 20px;
-}
+body { font-family: var(--font-family); margin: 0; padding: 20px; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.5s ease, color 0.5s ease; }
+.container { width: 100%; max-width: 900px; background: var(--container-bg); padding: 20px; border-radius: var(--border-radius-main); backdrop-filter: blur(20px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); transition: background 0.5s ease, border 0.5s ease; }
+.header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 20px; }
 .header-center { text-align: center; }
 .header-right { display: flex; justify-content: flex-end; }
-#branding {
-  font-size: 2.2rem;
-  font-weight: 800;
-  animation: rgb-blink 2s linear infinite;
-}
-@keyframes rgb-blink {
-  0%, 100% { color: #ff5757; text-shadow: 0 0 8px #ff5757; }
-  25% { color: #57ff89; text-shadow: 0 0 8px #57ff89; }
-  50% { color: #57a5ff; text-shadow: 0 0 8px #57a5ff; }
-  75% { color: #fffa57; text-shadow: 0 0 8px #fffa57; }
-}
+#branding { font-size: 2.2rem; font-weight: 800; animation: rgb-blink 2s linear infinite; }
+@keyframes rgb-blink { 0%, 100% { color: #ff5757; text-shadow: 0 0 8px #ff5757; } 25% { color: #57ff89; text-shadow: 0 0 8px #57ff89; } 50% { color: #57a5ff; text-shadow: 0 0 8px #57a5ff; } 75% { color: #fffa57; text-shadow: 0 0 8px #fffa57; } }
 .theme-switch-wrapper { display: flex; align-items: center; }
 .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
 .theme-switch input { display:none; }
@@ -94,32 +55,34 @@ input:checked + .slider:before { transform: translateX(26px); }
 body.light-theme .slider:after { opacity: 1; }
 .slider:before { content: '🌙'; color: var(--bg-gradient-start); display: flex; align-items: center; justify-content: center; font-size: 14px; }
 body.light-theme .slider:before { content: ''; background-color: #fff; }
-
 #dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 15px; background-color: var(--header-bg); border-radius: var(--border-radius-small); margin-bottom: 20px; }
 .stat-card { text-align: center; }
 .stat-card h3 { margin: 0; font-size: 1rem; color: var(--text-color-muted); font-weight: 500; }
 .stat-card p { margin: 5px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--mobile-indicator); }
-.filters-container { display: flex; gap: 15px; margin-bottom: 20px; }
-.filters-container input { flex-grow: 1; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
-.filters-container input:focus { outline: none; border-color: var(--desktop-indicator); box-shadow: 0 0 10px rgba(33, 150, 243, 0.3); }
-
+.controls-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.filters-container { display: flex; gap: 15px; flex-grow: 1; }
+.filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 .table-container { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th { background: var(--header-bg); cursor: pointer; user-select: none; transition: background-color 0.2s; }
+th:hover { background: var(--row-hover-bg); }
+th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
+th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
-th { background: var(--header-bg); }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
 tbody tr:hover { background: var(--row-hover-bg); }
 tr.mobile { border-left: 4px solid var(--mobile-indicator); }
 tr.desktop { border-left: 4px solid var(--desktop-indicator); }
-
 .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
-.pagination-container button, .map-toggle button { padding: 8px 16px; border: none; border-radius: var(--border-radius-small); cursor: pointer; font-weight: 600; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; }
+.pagination-container button, .map-toggle button, .export-btn { padding: 8px 16px; border: none; border-radius: var(--border-radius-small); cursor: pointer; font-weight: 600; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; }
 .pagination-container button:disabled { background: var(--header-bg); color: var(--disabled-color); cursor: not-allowed; }
-.pagination-container button:hover:not(:disabled), .map-toggle button:hover { opacity: 0.8; }
+.pagination-container button:hover:not(:disabled), .map-toggle button:hover, .export-btn:hover { opacity: 0.8; }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0, 0, 0, 0.7); animation: fadeIn 0.5s; }
 .modal-content { background: var(--container-bg); backdrop-filter: blur(10px); margin: 5% auto; padding: 25px; border-radius: var(--border-radius-main); max-width: 950px; color: var(--text-color); position: relative; border: 1px solid var(--border-color); }
 .close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
-#modalDetails { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; margin-bottom: 15px; }
+#modalDetails { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px; }
+#modalDetails h4 { margin: 10px 0 5px 0; color: var(--desktop-indicator); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; grid-column: 1 / -1; }
+#modalDetails div { font-size: 14px; }
 #modalMapWrapper { position: relative; width: 100%; height: 400px; border-radius: var(--border-radius-main); margin-top: 15px; overflow: hidden; }
 #modalMap { width: 100%; height: 100%; }
 .loader { display: none; margin: 20px auto; text-align: center; }
@@ -129,19 +92,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .map-toggle { margin-top: 15px; text-align: center; }
 .map-toggle button.active { background: var(--mobile-indicator); transform: translateY(-2px); }
-
-@media (max-width: 920px) {
-  .header { grid-template-columns: 1fr auto; }
-  .header-left { display: none; }
-}
-@media (max-width: 700px) {
-  .header { grid-template-columns: 1fr; gap: 15px; }
-  .header-right { justify-content: center; }
-  #dashboard { grid-template-columns: 1fr; }
-  .filters-container { flex-direction: column; }
-  .modal-content { width: 95%; margin-top: 10%;}
-  #modalMapWrapper { height: 300px; }
-}
+@media (max-width: 920px) { .header { grid-template-columns: 1fr auto; } .header-left { display: none; } }
+@media (max-width: 700px) { .header { grid-template-columns: 1fr; gap: 15px; } .header-right { justify-content: center; } #dashboard { grid-template-columns: 1fr; } .controls-header { flex-direction: column; align-items: stretch; } .filters-container { flex-direction: column; } .modal-content { width: 95%; margin-top: 10%;} #modalMapWrapper { height: 300px; } }
 </style>
 </head>
 <body>
@@ -157,14 +109,22 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     </div>
   </div>
   <div id="dashboard"></div>
-  <div class="filters-container">
-    <input type="text" id="deviceFilter" placeholder="Filter by Device...">
-    <input type="text" id="cityFilter" placeholder="Filter by City...">
+  <div class="controls-header">
+      <div class="filters-container">
+        <input type="text" id="deviceFilter" placeholder="Filter by Device...">
+        <input type="text" id="cityFilter" placeholder="Filter by City...">
+      </div>
+      <button class="export-btn" id="exportBtn">Export to CSV</button>
   </div>
   <div class="loader" id="mainLoader"><span></span></div>
   <div class="table-container">
     <table id="entriesTable">
-      <thead><tr><th>Date / Time</th><th>Device Type</th><th>IP Address</th><th>City</th></tr></thead>
+      <thead><tr>
+          <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
+          <th data-sort="device">Device Type <span class="sort-icon"></span></th>
+          <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
+          <th data-sort="city">City <span class="sort-icon"></span></th>
+      </tr></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -175,10 +135,13 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   </div>
 </main>
 
+<!-- MODAL STRUCTURE IS NOW PERMANENTLY IN THE HTML -->
 <div id="detailModal" class="modal">
   <div class="modal-content">
     <span class="close" id="closeModal">&times;</span>
-    <div id="modalDetails"></div>
+    <div id="modalDetails">
+      <!-- Content will be populated by JavaScript -->
+    </div>
     <div class="map-toggle">
       <button id="streetBtn" class="active">Street View</button>
       <button id="satBtn">Satellite View</button>
@@ -198,29 +161,146 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  
   const firebaseConfig = { apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag", authDomain: "livelocationtracker-bcd3d.firebaseapp.com", databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "livelocationtracker-bcd3d", storageBucket: "livelocationtracker-bcd3d.appspot.com", messagingSenderId: "800051113276", appId: "1:800051113276:web:61f0162a9e95aba9cb4239" };
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  let state = { allEntries: [], filteredEntries: [], currentPage: 1, entriesPerPage: 15, map: null, mapMarker: null, mapJourneyLine: null, currentLayer: null, mapLoaderTimeout: null };
+  
+  let state = {
+    allEntries: [], filteredEntries: [], currentPage: 1, entriesPerPage: 15, 
+    map: null, mapMarker: null, mapJourneyLine: null, currentLayer: null, mapLoaderTimeout: null,
+    sortColumn: 'timestamp', sortDirection: 'desc'
+  };
+
   const ENTRIES_LIMIT = 100;
   const MAP_DEFAULTS = { gpsZoom: 15, ipZoom: 6, worldZoom: 2, flyToDuration: 3, loaderFailsafe: 8000 };
-  const TILE_LAYERS = { street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }), satellite: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google' }) };
-  const UIElements = { body: document.body, themeToggle: document.getElementById('theme-checkbox'), dashboard: document.getElementById('dashboard'), tableBody: document.querySelector("#entriesTable tbody"), loader: document.getElementById("mainLoader"), deviceFilter: document.getElementById("deviceFilter"), cityFilter: document.getElementById("cityFilter"), prevBtn: document.getElementById("prevBtn"), nextBtn: document.getElementById("nextBtn"), pageInfo: document.getElementById("pageInfo"), modal: document.getElementById("detailModal"), closeModalBtn: document.getElementById("closeModal"), modalDetails: document.getElementById("modalDetails"), modalMapDiv: document.getElementById("modalMap"), mapLoader: document.getElementById("mapLoader"), streetBtn: document.getElementById("streetBtn"), satBtn: document.getElementById("satBtn"), ipBtn: document.getElementById("ipBtn"), journeyBtn: document.getElementById("journeyBtn"), };
+  const TILE_LAYERS = {
+    street: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }),
+    satellite: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google' })
+  };
+  const UIElements = {
+    body: document.body, themeToggle: document.getElementById('theme-checkbox'),
+    dashboard: document.getElementById('dashboard'), tableHeaders: document.querySelectorAll("#entriesTable thead th"),
+    tableBody: document.querySelector("#entriesTable tbody"), loader: document.getElementById("mainLoader"),
+    deviceFilter: document.getElementById("deviceFilter"), cityFilter: document.getElementById("cityFilter"),
+    exportBtn: document.getElementById("exportBtn"), prevBtn: document.getElementById("prevBtn"),
+    nextBtn: document.getElementById("nextBtn"), pageInfo: document.getElementById("pageInfo"),
+    // Modal elements are now directly referenced
+    modal: document.getElementById("detailModal"),
+    closeModalBtn: document.getElementById("closeModal"),
+    modalDetails: document.getElementById("modalDetails"),
+    modalMapDiv: document.getElementById("modalMap"),
+    mapLoader: document.getElementById("mapLoader"),
+    streetBtn: document.getElementById("streetBtn"),
+    satBtn: document.getElementById("satBtn"),
+    ipBtn: document.getElementById("ipBtn"),
+    journeyBtn: document.getElementById("journeyBtn"),
+  };
 
-  async function fetchAreaName(lat, lon) { const areaSpan = document.getElementById('area-lookup'); if (!areaSpan) return; try { const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`); if (!response.ok) throw new Error('Network response failed'); const data = await response.json(); const addr = data.address; const areaName = addr.neighbourhood || addr.suburb || addr.quarter || addr.road || 'Area not found'; areaSpan.textContent = areaName; } catch (error) { console.error("Reverse geocoding failed:", error); areaSpan.textContent = "Could not determine area"; } }
-  function fetchAndRenderData() { UIElements.loader.style.display = "block"; const locationsQuery = query(ref(db, "locations"), orderByChild('timestamp'), limitToLast(ENTRIES_LIMIT)); onValue(locationsQuery, (snapshot) => { const data = snapshot.val(); if (data) { state.allEntries = Object.keys(data).map(key => ({ id: key, ...data[key] })).sort((a, b) => b.timestamp - a.timestamp); state.currentPage = 1; applyFiltersAndRender(); } else { showNoDataMessage(); } UIElements.loader.style.display = "none"; }, (error) => { console.error("Firebase data fetch error:", error); showNoDataMessage("Error fetching data."); }); }
-  function applyFiltersAndRender() { const deviceFilterText = UIElements.deviceFilter.value.toLowerCase(); const cityFilterText = UIElements.cityFilter.value.toLowerCase(); state.filteredEntries = state.allEntries.filter(entry => { const deviceMatch = entry.device?.toLowerCase().includes(deviceFilterText) ?? true; const cityMatch = entry.city?.toLowerCase().includes(cityFilterText) ?? true; return deviceMatch && cityMatch; }); state.currentPage = 1; renderAll(); }
-  function renderAll() { updateDashboardStats(state.filteredEntries); renderTable(); renderPagination(); }
-  function updateDashboardStats(entries) { const totalShown = entries.length; const uniqueDevices = new Set(entries.map(e => e.device)).size; const cityCounts = entries.reduce((acc, e) => { if(e.city) acc[e.city] = (acc[e.city] || 0) + 1; return acc; }, {}); const mostCommonCity = Object.keys(cityCounts).reduce((a, b) => cityCounts[a] > cityCounts[b] ? a : b, 'N/A'); UIElements.dashboard.innerHTML = `<div class="stat-card"><h3>Total Entries</h3><p>${totalShown}</p></div><div class="stat-card"><h3>Unique Devices</h3><p>${uniqueDevices}</p></div><div class="stat-card"><h3>Most Active City</h3><p>${mostCommonCity}</p></div>`; }
-  function formatTimeAgo(timestamp) { const now = new Date(); const seconds = Math.floor((now - new Date(timestamp)) / 1000); let interval = seconds / 31536000; if (interval > 1) return Math.floor(interval) + " years ago"; interval = seconds / 2592000; if (interval > 1) return Math.floor(interval) + " months ago"; interval = seconds / 86400; if (interval > 1) return Math.floor(interval) + " days ago"; interval = seconds / 3600; if (interval > 1) return Math.floor(interval) + " hours ago"; interval = seconds / 60; if (interval > 1) return Math.floor(interval) + " minutes ago"; return "just now"; }
-  function renderTable() { UIElements.tableBody.innerHTML = ""; if (state.filteredEntries.length === 0) { showNoDataMessage("No entries match your search."); return; } const startIndex = (state.currentPage - 1) * state.entriesPerPage; const pageEntries = state.filteredEntries.slice(startIndex, startIndex + state.entriesPerPage); const fragment = document.createDocumentFragment(); pageEntries.forEach(entry => { const tr = document.createElement("tr"); tr.dataset.entryId = entry.id; tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`; tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} - <b>${formatTimeAgo(entry.timestamp)}</b></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`; fragment.appendChild(tr); }); UIElements.tableBody.appendChild(fragment); }
-  function renderPagination() { const totalPages = Math.ceil(state.filteredEntries.length / state.entriesPerPage); const paginationContainer = UIElements.prevBtn.parentElement; if (totalPages <= 1) { paginationContainer.style.display = 'none'; return; } paginationContainer.style.display = 'flex'; UIElements.pageInfo.textContent = `Page ${state.currentPage} of ${totalPages}`; UIElements.prevBtn.disabled = state.currentPage === 1; UIElements.nextBtn.disabled = state.currentPage === totalPages; }
-  function showNoDataMessage(message = "No shared details found.") { UIElements.tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${message}</td></tr>`; updateDashboardStats([]); renderPagination(); }
-  
+  async function fetchAreaName(lat, lon) {
+    const areaSpan = document.querySelector('#area-lookup'); if (!areaSpan) return;
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+        if (!response.ok) throw new Error('Network response failed');
+        const data = await response.json(); const addr = data.address;
+        const areaName = addr.neighbourhood || addr.suburb || addr.quarter || addr.road || 'Area not found';
+        areaSpan.textContent = areaName;
+    } catch (error) { console.error("Reverse geocoding failed:", error); areaSpan.textContent = "Could not determine area"; }
+  }
+
+  function fetchAndRenderData() {
+    UIElements.loader.style.display = "block";
+    const locationsQuery = query(ref(db, "locations"), orderByChild('timestamp'), limitToLast(ENTRIES_LIMIT));
+    onValue(locationsQuery, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        state.allEntries = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        applyFiltersAndRender();
+      } else { showNoDataMessage(); }
+      UIElements.loader.style.display = "none";
+    }, (error) => { console.error("Firebase data fetch error:", error); showNoDataMessage("Error fetching data."); });
+  }
+
+  function applyFiltersAndRender() {
+    const deviceFilterText = UIElements.deviceFilter.value.toLowerCase();
+    const cityFilterText = UIElements.cityFilter.value.toLowerCase();
+    state.filteredEntries = state.allEntries.filter(entry => {
+      const deviceMatch = entry.device?.toLowerCase().includes(deviceFilterText) ?? true;
+      const cityMatch = entry.city?.toLowerCase().includes(cityFilterText) ?? true;
+      return deviceMatch && cityMatch;
+    });
+    sortData();
+    renderAll();
+  }
+
+  function sortData() {
+    const { sortColumn, sortDirection } = state;
+    state.filteredEntries.sort((a, b) => {
+      let aVal = a[sortColumn] || ''; let bVal = b[sortColumn] || '';
+      if (sortColumn === 'timestamp') { aVal = Number(aVal); bVal = Number(bVal); }
+      else { aVal = String(aVal).toLowerCase(); bVal = String(bVal).toLowerCase(); }
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function renderAll() {
+    updateDashboardStats(state.filteredEntries);
+    renderTable();
+    renderPagination();
+  }
+
+  function updateDashboardStats(entries) {
+    const totalShown = entries.length; const uniqueDevices = new Set(entries.map(e => e.device)).size;
+    const cityCounts = entries.reduce((acc, e) => { if(e.city) acc[e.city] = (acc[e.city] || 0) + 1; return acc; }, {});
+    const mostCommonCity = Object.keys(cityCounts).reduce((a, b) => cityCounts[a] > cityCounts[b] ? a : b, 'N/A');
+    UIElements.dashboard.innerHTML = `<div class="stat-card"><h3>Total Entries</h3><p>${totalShown}</p></div><div class="stat-card"><h3>Unique Devices</h3><p>${uniqueDevices}</p></div><div class="stat-card"><h3>Most Active City</h3><p>${mostCommonCity}</p></div>`;
+  }
+
+  function formatTimeAgo(timestamp) {
+    const now = new Date(); const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+    if (seconds < 60) return "just now"; const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`; const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr ago`; const days = Math.floor(hours / 24);
+    return `${days} day ago`;
+  }
+
+  function renderTable() {
+    UIElements.tableBody.innerHTML = "";
+    if (state.filteredEntries.length === 0) { showNoDataMessage("No entries match your search."); return; }
+    const startIndex = (state.currentPage - 1) * state.entriesPerPage;
+    const pageEntries = state.filteredEntries.slice(startIndex, startIndex + state.entriesPerPage);
+    const fragment = document.createDocumentFragment();
+    pageEntries.forEach(entry => {
+      const tr = document.createElement("tr"); tr.dataset.entryId = entry.id;
+      tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`;
+      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} - <b>${formatTimeAgo(entry.timestamp)}</b></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
+      fragment.appendChild(tr);
+    });
+    UIElements.tableBody.appendChild(fragment);
+  }
+
+  function renderPagination() {
+    const totalPages = Math.ceil(state.filteredEntries.length / state.entriesPerPage);
+    const paginationContainer = UIElements.prevBtn.parentElement;
+    if (totalPages <= 1) { paginationContainer.style.display = 'none'; return; }
+    paginationContainer.style.display = 'flex';
+    UIElements.pageInfo.textContent = `Page ${state.currentPage} of ${totalPages}`;
+    UIElements.prevBtn.disabled = state.currentPage === 1;
+    UIElements.nextBtn.disabled = state.currentPage === totalPages;
+  }
+
+  function showNoDataMessage(message = "No shared details found.") {
+    UIElements.tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${message}</td></tr>`;
+    updateDashboardStats([]); renderPagination();
+  }
+
   function populateModalDetails(entry) {
     const savedAtDate = new Date(entry.timestamp);
     const savedAtText = `${savedAtDate.toLocaleString()} (${formatTimeAgo(savedAtDate)})`;
     let deviceInfo = "N/A", osInfo = "N/A", browserInfo = "N/A";
+
     if (entry.userAgent) {
         const parser = new UAParser(entry.userAgent);
         const result = parser.getResult();
@@ -230,23 +310,187 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         osInfo = `${result.os.name || ''} ${result.os.version || ''}`.trim() || 'N/A';
         browserInfo = `${result.browser.name || ''} ${result.browser.version || ''}`.trim() || 'N/A';
     }
-    UIElements.modalDetails.innerHTML = `<div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>GPS Coords:</b> ${entry.gps_lat || 'N/A'}, ${entry.gps_lon || 'N/A'}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><div style="grid-column: 1 / -1;"><b>Saved At:</b> ${savedAtText}</div>`;
-    if (entry.gps_lat && entry.gps_lon) { fetchAreaName(entry.gps_lat, entry.gps_lon); } else { const areaSpan = document.getElementById('area-lookup'); if(areaSpan) areaSpan.textContent = 'N/A (No GPS)'; }
+
+    UIElements.modalDetails.innerHTML = `
+        <h4>Device & OS</h4>
+        <div><b>Device Brand:</b> ${deviceInfo}</div>
+        <div><b>OS:</b> ${osInfo}</div>
+        <div><b>Browser:</b> ${browserInfo}</div>
+        <div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div>
+        
+        <h4>Location Details</h4>
+        <div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div>
+        <div><b>City:</b> ${entry.city || 'N/A'}</div>
+        <div><b>Region:</b> ${entry.region || 'N/A'}</div>
+        <div><b>Country:</b> ${entry.country || 'N/A'}</div>
+        
+        <h4>Network & Connection</h4>
+        <div><b>IP Address:</b> ${entry.ip || 'N/A'}</div>
+        <div><b>ISP:</b> ${entry.isp || 'N/A'}</div>
+        <div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div>
+        <div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div>
+
+        <h4>Hardware Specs</h4>
+        <div><b>Battery:</b> ${entry.battery || 'N/A'}</div>
+        <div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div>
+        <div><b>CPU Cores:</b> ${entry.cpuCores || 'N/A'}</div>
+        <div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div>
+
+        <h4 style="margin-top:20px;">Other</h4>
+        <div><b>Saved At:</b> ${savedAtText}</div>
+    `;
+    
+    if (entry.gps_lat && entry.gps_lon) {
+        fetchAreaName(entry.gps_lat, entry.gps_lon);
+    } else {
+        const areaSpan = UIElements.modalDetails.querySelector('#area-lookup');
+        if(areaSpan) areaSpan.textContent = 'N/A (No GPS)';
+    }
   }
 
-  function openModal(entry) { populateModalDetails(entry); UIElements.modal.style.display = "block"; initializeMap(entry); }
-  function closeModal() { UIElements.modal.style.display = "none"; if (state.map) { state.map.remove(); state.map = null; } }
-  function initializeMap(entry) { if (state.map) state.map.remove(); UIElements.mapLoader.style.display = 'block'; state.map = L.map(UIElements.modalMapDiv).setView([20, 0], MAP_DEFAULTS.worldZoom); state.currentLayer = TILE_LAYERS.street.addTo(state.map); state.currentLayer.on('load', handleMapLoad); state.mapMarker = L.marker([entry.gps_lat || 0, entry.gps_lon || 0]).addTo(state.map); setTimeout(() => { switchMapView('street', entry); }, 500); setupMapControls(entry); }
+  function openModal(entry) {
+    populateModalDetails(entry);
+    UIElements.modal.style.display = "block";
+    initializeMap(entry);
+  }
+  function closeModal() {
+      UIElements.modal.style.display = "none";
+      if (state.map) { state.map.remove(); state.map = null; }
+  }
+
+  function initializeMap(entry) {
+    if (state.map) state.map.remove();
+    UIElements.mapLoader.style.display = 'block';
+    state.map = L.map(UIElements.modalMapDiv).setView([20, 0], MAP_DEFAULTS.worldZoom);
+    state.currentLayer = TILE_LAYERS.street.addTo(state.map);
+    state.currentLayer.on('load', () => UIElements.mapLoader.style.display = 'none');
+    state.mapMarker = L.marker([entry.gps_lat || 0, entry.gps_lon || 0]).addTo(state.map);
+    setTimeout(() => { switchMapView('street', entry); }, 500);
+    setupMapControls(entry);
+  }
+
   function clearJourneyLine() { if (state.mapJourneyLine) { state.map.removeLayer(state.mapJourneyLine); state.mapJourneyLine = null; } }
-  function setupMapControls(entry) { UIElements.streetBtn.onclick = () => switchMapView('street', entry); UIElements.satBtn.onclick = () => switchMapView('satellite', entry); UIElements.ipBtn.onclick = () => switchMapView('ip', entry); UIElements.journeyBtn.onclick = () => drawDeviceJourney(entry); }
-  function switchMapView(viewType, entry) { clearJourneyLine(); UIElements.mapLoader.style.display = 'block'; if(state.map.hasLayer(state.currentLayer)) state.map.removeLayer(state.currentLayer); clearTimeout(state.mapLoaderTimeout); state.mapLoaderTimeout = setTimeout(() => UIElements.mapLoader.style.display = 'none', MAP_DEFAULTS.loaderFailsafe); let lat, lon, zoom, newLayer; const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn, UIElements.journeyBtn]; buttons.forEach(btn => btn.classList.remove('active')); if (viewType === 'ip') { lat = entry.ip_lat || 20; lon = entry.ip_lon || 0; zoom = MAP_DEFAULTS.ipZoom; newLayer = TILE_LAYERS.street; UIElements.ipBtn.classList.add('active'); } else { lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom; newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street; (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active'); } state.currentLayer = newLayer.addTo(state.map); state.currentLayer.on('load', handleMapLoad); state.map.flyTo([lat, lon], zoom); state.mapMarker.setLatLng([lat, lon]); updateMarkerPopup(viewType, entry); }
-  function drawDeviceJourney(currentEntry) { clearJourneyLine(); if (!currentEntry || !currentEntry.device) { alert("Cannot determine device to track journey."); return; } const journeyEntries = state.allEntries.filter(e => e.device === currentEntry.device && e.gps_lat && e.gps_lon).sort((a, b) => a.timestamp - b.timestamp); if (journeyEntries.length < 2) { alert("Not enough location points to draw a journey for this device."); return; } [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn].forEach(btn => btn.classList.remove('active')); UIElements.journeyBtn.classList.add('active'); const journeyCoords = journeyEntries.map(e => [parseFloat(e.gps_lat), parseFloat(e.gps_lon)]); try { state.mapJourneyLine = L.polyline(journeyCoords, { color: 'var(--mobile-indicator)', weight: 3 }).addTo(state.map); state.map.fitBounds(state.mapJourneyLine.getBounds(), { padding: [50, 50] }); const lastPoint = journeyCoords[journeyCoords.length - 1]; state.mapMarker.setLatLng(lastPoint).bringToFront(); updateMarkerPopup('gps', currentEntry); } catch (error) { console.error("Could not draw journey line:", error); alert("An error occurred while trying to display the journey."); } }
-  function updateMarkerPopup(type, entry) { let popupContent = (type === 'ip') ? `<b>IP Location:</b> ${entry.ip}<br>${entry.city}, ${entry.country}` : `<b>GPS Location</b><br>Device: ${entry.device}`; state.mapMarker.bindPopup(popupContent).openPopup(); }
-  function handleMapLoad() { UIElements.mapLoader.style.display = 'none'; clearTimeout(state.mapLoaderTimeout); }
-  function applyTheme(theme) { if (theme === 'light') { UIElements.body.classList.add('light-theme'); UIElements.themeToggle.checked = true; } else { UIElements.body.classList.remove('light-theme'); UIElements.themeToggle.checked = false; } }
-  function setupTheme() { const savedTheme = localStorage.getItem('theme') || 'dark'; applyTheme(savedTheme); UIElements.themeToggle.addEventListener('change', () => { const newTheme = UIElements.themeToggle.checked ? 'light' : 'dark'; localStorage.setItem('theme', newTheme); applyTheme(newTheme); }); }
-  function setupEventListeners() { UIElements.deviceFilter.addEventListener('keyup', applyFiltersAndRender); UIElements.cityFilter.addEventListener('keyup', applyFiltersAndRender); UIElements.tableBody.addEventListener('click', (event) => { const row = event.target.closest('tr'); if (row && row.dataset.entryId) { const entry = state.allEntries.find(e => e.id === row.dataset.entryId); if (entry) openModal(entry); } }); UIElements.prevBtn.addEventListener('click', () => { if (state.currentPage > 1) { state.currentPage--; renderAll(); } }); UIElements.nextBtn.addEventListener('click', () => { if (state.currentPage < Math.ceil(state.filteredEntries.length / state.entriesPerPage)) { state.currentPage++; renderAll(); } }); UIElements.closeModalBtn.onclick = closeModal; window.onclick = (event) => { if (event.target == UIElements.modal) closeModal(); }; }
-  document.addEventListener('DOMContentLoaded', () => { setupTheme(); setupEventListeners(); fetchAndRenderData(); });
+
+  function setupMapControls(entry) {
+    UIElements.streetBtn.onclick = () => switchMapView('street', entry);
+    UIElements.satBtn.onclick = () => switchMapView('satellite', entry);
+    UIElements.ipBtn.onclick = () => switchMapView('ip', entry);
+    UIElements.journeyBtn.onclick = () => drawDeviceJourney(entry);
+  }
+
+  function switchMapView(viewType, entry) {
+    clearJourneyLine();
+    UIElements.mapLoader.style.display = 'block';
+    if(state.map.hasLayer(state.currentLayer)) state.map.removeLayer(state.currentLayer);
+    clearTimeout(state.mapLoaderTimeout);
+    state.mapLoaderTimeout = setTimeout(() => UIElements.mapLoader.style.display = 'none', MAP_DEFAULTS.loaderFailsafe);
+    let lat, lon, zoom, newLayer;
+    const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn, UIElements.journeyBtn];
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (viewType === 'ip') {
+      lat = entry.ip_lat || 20; lon = entry.ip_lon || 0; zoom = MAP_DEFAULTS.ipZoom;
+      newLayer = TILE_LAYERS.street;
+      UIElements.ipBtn.classList.add('active');
+    } else {
+      lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
+      newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
+      (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active');
+    }
+    state.currentLayer = newLayer.addTo(state.map);
+    state.currentLayer.on('load', () => UIElements.mapLoader.style.display = 'none');
+    state.map.flyTo([lat, lon], zoom);
+    state.mapMarker.setLatLng([lat, lon]);
+    updateMarkerPopup(viewType, entry);
+  }
+
+  function drawDeviceJourney(currentEntry) {
+    clearJourneyLine();
+    if (!currentEntry || !currentEntry.device) { alert("Cannot determine device to track journey."); return; }
+    const journeyEntries = state.allEntries.filter(e => e.device === currentEntry.device && e.gps_lat && e.gps_lon).sort((a, b) => a.timestamp - b.timestamp);
+    if (journeyEntries.length < 2) { alert("Not enough location points to draw a journey for this device."); return; }
+    [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn].forEach(btn => btn.classList.remove('active'));
+    UIElements.journeyBtn.classList.add('active');
+    const journeyCoords = journeyEntries.map(e => [parseFloat(e.gps_lat), parseFloat(e.gps_lon)]);
+    try {
+        state.mapJourneyLine = L.polyline(journeyCoords, { color: 'var(--mobile-indicator)', weight: 3 }).addTo(state.map);
+        state.map.fitBounds(state.mapJourneyLine.getBounds(), { padding: [50, 50] });
+        const lastPoint = journeyCoords[journeyCoords.length - 1];
+        state.mapMarker.setLatLng(lastPoint).bringToFront();
+        updateMarkerPopup('gps', currentEntry);
+    } catch (error) { console.error("Could not draw journey line:", error); alert("An error occurred while trying to display the journey."); }
+  }
+
+  function updateMarkerPopup(type, entry) {
+    let popupContent = (type === 'ip') ? `<b>IP Location:</b> ${entry.ip}<br>${entry.city}, ${entry.country}` : `<b>GPS Location</b><br>Device: ${entry.device}`;
+    state.mapMarker.bindPopup(popupContent).openPopup();
+  }
+  
+  function applyTheme(theme) {
+    if (theme === 'light') { UIElements.body.classList.add('light-theme'); UIElements.themeToggle.checked = true; }
+    else { UIElements.body.classList.remove('light-theme'); UIElements.themeToggle.checked = false; }
+  }
+
+  function setupTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark'; applyTheme(savedTheme);
+    UIElements.themeToggle.addEventListener('change', () => {
+      const newTheme = UIElements.themeToggle.checked ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme); applyTheme(newTheme);
+    });
+  }
+
+  function setupEventListeners() {
+    UIElements.deviceFilter.addEventListener('keyup', applyFiltersAndRender);
+    UIElements.cityFilter.addEventListener('keyup', applyFiltersAndRender);
+    UIElements.tableBody.addEventListener('click', (event) => {
+      const row = event.target.closest('tr');
+      if (row && row.dataset.entryId) { const entry = state.allEntries.find(e => e.id === row.dataset.entryId); if (entry) openModal(entry); }
+    });
+    UIElements.prevBtn.addEventListener('click', () => { if (state.currentPage > 1) { state.currentPage--; renderAll(); } });
+    UIElements.nextBtn.addEventListener('click', () => { if (state.currentPage < Math.ceil(state.filteredEntries.length / state.entriesPerPage)) { state.currentPage++; renderAll(); } });
+    UIElements.closeModalBtn.onclick = closeModal;
+    window.onclick = (event) => { if (event.target == UIElements.modal) closeModal(); };
+    UIElements.exportBtn.addEventListener('click', exportToCSV);
+    UIElements.tableHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const column = header.dataset.sort; if(!column) return;
+        if (state.sortColumn === column) { state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc'; }
+        else { state.sortColumn = column; state.sortDirection = 'desc'; }
+        sortData(); renderAll(); updateSortIcons();
+      });
+    });
+  }
+
+  function updateSortIcons() {
+    UIElements.tableHeaders.forEach(header => {
+      const icon = header.querySelector('.sort-icon'); if(!icon) return;
+      header.classList.remove('sorted-asc', 'sorted-desc');
+      if (header.dataset.sort === state.sortColumn) {
+        icon.textContent = state.sortDirection === 'asc' ? '▲' : '▼';
+        header.classList.add('sorted-' + state.sortDirection);
+      } else { icon.textContent = ''; }
+    });
+  }
+
+  function exportToCSV() {
+    const headers = ['Timestamp', 'Device', 'CGPA', 'Battery', 'Timezone', 'IP Address', 'City', 'Region', 'Country', 'ISP', 'GPS Latitude', 'GPS Longitude', 'User Agent', 'Screen Resolution', 'CPU Cores', 'RAM (GB)', 'Connection Type'];
+    const rows = state.filteredEntries.map(e => [
+        new Date(e.timestamp).toLocaleString(), e.device, e.cgpa, e.battery, e.timezone, e.ip, e.city, e.region, e.country, e.isp,
+        e.gps_lat, e.gps_lon, `"${e.userAgent ? e.userAgent.replace(/"/g, '""') : ''}"`, e.screenResolution, e.cpuCores, e.deviceMemory, e.connectionType
+    ].join(','));
+    let csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\n' + rows.join('\n');
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "device_data.csv");
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    setupTheme();
+    setupEventListeners();
+    fetchAndRenderData();
+    updateSortIcons();
+  });
 </script>
 
 </body>

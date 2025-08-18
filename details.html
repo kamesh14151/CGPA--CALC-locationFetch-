@@ -71,7 +71,7 @@ body {
 .header-center { text-align: center; }
 .header-right { display: flex; justify-content: flex-end; }
 #branding { font-size: clamp(1.8rem, 5vw, 2.2rem); font-weight: 800; animation: rgb-blink 2s linear infinite; }
-@keyframes rgb-blink { 0%, 100% { color: #ff5757; text-shadow: 0 0 8px #ff5757; } 25% { color: #57ff89; text-shadow: 0 0 8px #57ff89; } 50% { color: #57a5ff; text-shadow: 0 0 8px #57a5ff; } 75% { color: #fffa57; text-shadow: 0 0 8px #fffa57; } }
+@keyframes rgb-blink { 0%, 100% { color: #ff5757; } 25% { color: #57ff89; } 50% { color: #57a5ff; } 75% { color: #fffa57; } }
 .theme-switch-wrapper { display: flex; align-items: center; }
 .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
 .theme-switch input { display:none; }
@@ -87,13 +87,15 @@ input:checked + .slider:before { transform: translateX(26px); }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 .table-container { width: 100%; overflow-x: auto; position: relative; }
-.table-container.is-scrollable::after { content: ''; position: absolute; top: 0; right: 0; width: 40px; height: 100%; background: linear-gradient(to left, var(--bg-gradient-end), transparent); pointer-events: none; }
+.table-container.is-scrollable::after { content: 'scroll →'; position: absolute; top: 0; right: 0; bottom: 0; width: 80px; background: linear-gradient(to left, var(--bg-gradient-end) 60%, transparent); pointer-events: none; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 12px; font-weight: bold; color: var(--text-color-muted); animation: pulse 2.5s infinite; opacity: 0; }
+@keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th { background: var(--header-bg); cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
 th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
+.time-ago { color: var(--text-color-muted); font-size: 0.85em; }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
 tbody tr:hover { background: var(--row-hover-bg); }
 tr.mobile { border-left: 4px solid var(--mobile-indicator); }
@@ -138,7 +140,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   .controls-header { flex-direction: column; align-items: stretch; } 
   .filters-container { flex-direction: column; } 
   .modal-content { padding: 15px; }
-  #modalMapWrapper { height: 300px; } 
+  #modalMapWrapper { height: 300px; }
+  td:first-child { line-height: 1.4; white-space: normal; }
+  td .main-date { display: block; } 
 }
 @media (max-width: 480px) {
   body { padding: 10px; }
@@ -362,7 +366,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     pageEntries.forEach(entry => {
       const tr = document.createElement("tr"); tr.dataset.entryId = entry.id;
       tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`;
-      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} - <b>${formatTimeAgo(entry.timestamp)}</b></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
+      tr.innerHTML = `<td><span class="main-date">${new Date(entry.timestamp).toLocaleDateString()}</span><span class="time-ago">${formatTimeAgo(entry.timestamp)}</span></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
       fragment.appendChild(tr);
     });
     UIElements.tableBody.appendChild(fragment);

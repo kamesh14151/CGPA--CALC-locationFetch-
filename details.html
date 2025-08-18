@@ -23,6 +23,7 @@
   --desktop-indicator: #2196F3;
   --loader-color: #0d47a1;
   --disabled-color: rgba(255, 255, 255, 0.3);
+  --error-color: #ff5757;
   --border-radius-main: 15px;
   --border-radius-small: 8px;
   --font-family: 'Poppins', sans-serif;
@@ -37,7 +38,7 @@ body.light-theme {
   --header-bg: rgba(0, 0, 0, 0.05);
   --row-hover-bg: rgba(0, 0, 0, 0.1);
 }
-body { font-family: var(--font-family); margin: 0; padding: 20px; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.5s ease, color 0.5s ease; }
+body { font-family: var(--font-family); margin: 0; padding: 20px; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); color: var(--text-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; transition: background 0.5s ease, color 0.5s ease; }
 .container { width: 100%; max-width: 900px; background: var(--container-bg); padding: 20px; border-radius: var(--border-radius-main); backdrop-filter: blur(20px); border: 1px solid var(--border-color); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); transition: background 0.5s ease, border 0.5s ease; }
 .header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 20px; }
 .header-center { text-align: center; }
@@ -92,65 +93,94 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .map-toggle { margin-top: 15px; text-align: center; }
 .map-toggle button.active { background: var(--mobile-indicator); transform: translateY(-2px); }
+
+/* --- LOGIN STYLES --- */
+#login-wrapper { max-width: 400px; width: 100%; padding: 40px; }
+.login-form-group { margin-bottom: 20px; text-align: left; }
+.login-form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color-muted); }
+.login-form-group input { width: 100%; padding: 12px 15px; font-size: 16px; background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; box-sizing: border-box; }
+.login-form-group input:focus { outline: none; border-color: var(--desktop-indicator); box-shadow: 0 0 10px var(--desktop-indicator); }
+.login-form-group input#admin-name { background-color: rgba(0,0,0,0.4); font-weight: bold; cursor: not-allowed; }
+#login-wrapper button { width: 100%; padding: 12px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; }
+#login-wrapper button:hover { opacity: 0.8; transform: translateY(-2px); }
+#error-message { color: var(--error-color); margin-top: 15px; font-weight: 500; height: 20px; visibility: hidden; }
+
 @media (max-width: 920px) { .header { grid-template-columns: 1fr auto; } .header-left { display: none; } }
 @media (max-width: 700px) { .header { grid-template-columns: 1fr; gap: 15px; } .header-right { justify-content: center; } #dashboard { grid-template-columns: 1fr; } .controls-header { flex-direction: column; align-items: stretch; } .filters-container { flex-direction: column; } .modal-content { width: 95%; margin-top: 10%;} #modalMapWrapper { height: 300px; } }
 </style>
 </head>
 <body>
 
-<main class="container">
-  <div class="header">
-    <div class="header-left"></div>
-    <div class="header-center"><div id="branding">AJ STUDIOZ</div></div>
-    <div class="header-right">
-      <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="theme-checkbox"><input type="checkbox" id="theme-checkbox" /><div class="slider"></div></label>
-      </div>
+<!-- LOGIN SCREEN (Visible by default) -->
+<div id="login-wrapper" class="container">
+  <div id="branding" style="text-align:center;">AJ STUDIOZ</div>
+  <form id="login-form">
+    <div class="login-form-group">
+      <label for="admin-name">ADMIN</label>
+      <input type="text" id="admin-name" value="AJ KAMEZ" readonly>
     </div>
-  </div>
-  <div id="dashboard"></div>
-  <div class="controls-header">
-      <div class="filters-container">
-        <input type="text" id="deviceFilter" placeholder="Filter by Device...">
-        <input type="text" id="cityFilter" placeholder="Filter by City...">
-      </div>
-      <button class="export-btn" id="exportBtn">Export to CSV</button>
-  </div>
-  <div class="loader" id="mainLoader"><span></span></div>
-  <div class="table-container">
-    <table id="entriesTable">
-      <thead><tr>
-          <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
-          <th data-sort="device">Device Type <span class="sort-icon"></span></th>
-          <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
-          <th data-sort="city">City <span class="sort-icon"></span></th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="pagination-container">
-    <button id="prevBtn">Previous</button>
-    <span id="pageInfo"></span>
-    <button id="nextBtn">Next</button>
-  </div>
-</main>
+    <div class="login-form-group">
+      <label for="password">Enter Password</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit">LOGIN</button>
+    <p id="error-message" style="text-align:center;">Incorrect Password. Try again.</p>
+  </form>
+</div>
 
-<!-- MODAL STRUCTURE IS NOW PERMANENTLY IN THE HTML -->
-<div id="detailModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeModal">&times;</span>
-    <div id="modalDetails">
-      <!-- Content will be populated by JavaScript -->
+<!-- MAIN APP (Hidden by default) -->
+<div id="app-wrapper" style="display: none;">
+  <main class="container">
+    <div class="header">
+      <div class="header-left"></div>
+      <div class="header-center"><div id="branding">AJ STUDIOZ</div></div>
+      <div class="header-right">
+        <div class="theme-switch-wrapper">
+          <label class="theme-switch" for="theme-checkbox"><input type="checkbox" id="theme-checkbox" /><div class="slider"></div></label>
+        </div>
+      </div>
     </div>
-    <div class="map-toggle">
-      <button id="streetBtn" class="active">Street View</button>
-      <button id="satBtn">Satellite View</button>
-      <button id="ipBtn">IP Location</button>
-      <button id="journeyBtn">Show Journey</button>
+    <div id="dashboard"></div>
+    <div class="controls-header">
+        <div class="filters-container">
+          <input type="text" id="deviceFilter" placeholder="Filter by Device...">
+          <input type="text" id="cityFilter" placeholder="Filter by City...">
+        </div>
+        <button class="export-btn" id="exportBtn">Export to CSV</button>
     </div>
-    <div id="modalMapWrapper">
-      <div id="modalMap"></div>
-      <div id="mapLoader"><span></span></div>
+    <div class="loader" id="mainLoader"><span></span></div>
+    <div class="table-container">
+      <table id="entriesTable">
+        <thead><tr>
+            <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
+            <th data-sort="device">Device Type <span class="sort-icon"></span></th>
+            <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
+            <th data-sort="city">City <span class="sort-icon"></span></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pagination-container">
+      <button id="prevBtn">Previous</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn">Next</button>
+    </div>
+  </main>
+  
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <div id="modalDetails"></div>
+      <div class="map-toggle">
+        <button id="streetBtn" class="active">Street View</button>
+        <button id="satBtn">Satellite View</button>
+        <button id="ipBtn">IP Location</button>
+        <button id="journeyBtn">Show Journey</button>
+      </div>
+      <div id="modalMapWrapper">
+        <div id="modalMap"></div>
+        <div id="mapLoader"><span></span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -163,8 +193,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   
   const firebaseConfig = { apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag", authDomain: "livelocationtracker-bcd3d.firebaseapp.com", databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "livelocationtracker-bcd3d", storageBucket: "livelocationtracker-bcd3d.appspot.com", messagingSenderId: "800051113276", appId: "1:800051113276:web:61f0162a9e95aba9cb4239" };
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
   
   let state = {
     allEntries: [], filteredEntries: [], currentPage: 1, entriesPerPage: 15, 
@@ -179,13 +207,17 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     satellite: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google' })
   };
   const UIElements = {
+    loginWrapper: document.getElementById('login-wrapper'),
+    appWrapper: document.getElementById('app-wrapper'),
+    loginForm: document.getElementById('login-form'),
+    passwordInput: document.getElementById('password'),
+    errorMessage: document.getElementById('error-message'),
     body: document.body, themeToggle: document.getElementById('theme-checkbox'),
     dashboard: document.getElementById('dashboard'), tableHeaders: document.querySelectorAll("#entriesTable thead th"),
     tableBody: document.querySelector("#entriesTable tbody"), loader: document.getElementById("mainLoader"),
     deviceFilter: document.getElementById("deviceFilter"), cityFilter: document.getElementById("cityFilter"),
     exportBtn: document.getElementById("exportBtn"), prevBtn: document.getElementById("prevBtn"),
     nextBtn: document.getElementById("nextBtn"), pageInfo: document.getElementById("pageInfo"),
-    // Modal elements are now directly referenced
     modal: document.getElementById("detailModal"),
     closeModalBtn: document.getElementById("closeModal"),
     modalDetails: document.getElementById("modalDetails"),
@@ -197,6 +229,20 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     journeyBtn: document.getElementById("journeyBtn"),
   };
 
+  function showApp() {
+    UIElements.loginWrapper.style.display = 'none';
+    UIElements.appWrapper.style.display = 'block';
+  }
+
+  function initializeMainApp() {
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    setupTheme();
+    setupEventListeners();
+    fetchAndRenderData(db);
+    updateSortIcons();
+  }
+  
   async function fetchAreaName(lat, lon) {
     const areaSpan = document.querySelector('#area-lookup'); if (!areaSpan) return;
     try {
@@ -208,7 +254,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     } catch (error) { console.error("Reverse geocoding failed:", error); areaSpan.textContent = "Could not determine area"; }
   }
 
-  function fetchAndRenderData() {
+  function fetchAndRenderData(db) {
     UIElements.loader.style.display = "block";
     const locationsQuery = query(ref(db, "locations"), orderByChild('timestamp'), limitToLast(ENTRIES_LIMIT));
     onValue(locationsQuery, (snapshot) => {
@@ -485,11 +531,28 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   }
   
+  // --- LOGIN LOGIC ---
   document.addEventListener('DOMContentLoaded', () => {
-    setupTheme();
-    setupEventListeners();
-    fetchAndRenderData();
-    updateSortIcons();
+    // Check if user is already logged in for this session
+    if (sessionStorage.getItem('isAuthenticated') === 'true') {
+        showApp();
+        initializeMainApp();
+    }
+
+    UIElements.loginForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (UIElements.passwordInput.value === 'AJKAMEZ06') {
+            // Correct password
+            sessionStorage.setItem('isAuthenticated', 'true');
+            showApp();
+            initializeMainApp();
+        } else {
+            // Incorrect password
+            UIElements.errorMessage.style.visibility = 'visible';
+            UIElements.passwordInput.value = '';
+            UIElements.passwordInput.focus();
+        }
+    });
   });
 </script>
 

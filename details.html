@@ -60,7 +60,7 @@ body {
   width: 100%; 
   max-width: 900px; 
   background: var(--container-bg); 
-  padding: clamp(15px, 4vw, 25px); /* Responsive padding */
+  padding: clamp(15px, 4vw, 25px);
   border-radius: var(--border-radius-main); 
   backdrop-filter: blur(20px); 
   border: 1px solid var(--border-color); 
@@ -72,7 +72,6 @@ body {
 .header-right { display: flex; justify-content: flex-end; }
 #branding { font-size: clamp(1.8rem, 5vw, 2.2rem); font-weight: 800; animation: rgb-blink 2s linear infinite; }
 @keyframes rgb-blink { 0%, 100% { color: #ff5757; } 25% { color: #57ff89; } 50% { color: #57a5ff; } 75% { color: #fffa57; } }
-.theme-switch-wrapper { display: flex; align-items: center; }
 .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
 .theme-switch input { display:none; }
 .slider { background-color: var(--header-bg); border: 1px solid var(--border-color); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
@@ -86,9 +85,39 @@ input:checked + .slider:before { transform: translateX(26px); }
 .controls-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
-.table-container { width: 100%; overflow-x: auto; position: relative; }
-.table-container.is-scrollable::after { content: 'scroll →'; position: absolute; top: 0; right: 0; bottom: 0; width: 80px; background: linear-gradient(to left, var(--bg-gradient-end) 60%, transparent); pointer-events: none; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 12px; font-weight: bold; color: var(--text-color-muted); animation: pulse 2.5s infinite; opacity: 0; }
+
+/* --- HORIZONTAL SCROLLING TABLE --- */
+.table-container { 
+  width: 100%; 
+  overflow-x: auto; 
+  position: relative; 
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+.table-container.is-scrollable::after {
+  content: 'scroll →';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 80px;
+  background: linear-gradient(to left, var(--bg-gradient-end) 60%, transparent);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-color-muted);
+  animation: pulse 2.5s infinite;
+  opacity: 0; /* Hidden by default, shown by JS */
+  transition: opacity 0.3s;
+}
+.table-container.is-scrollable.show-indicator::after {
+    opacity: 1;
+}
 @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th { background: var(--header-bg); cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
@@ -140,9 +169,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   .controls-header { flex-direction: column; align-items: stretch; } 
   .filters-container { flex-direction: column; } 
   .modal-content { padding: 15px; }
-  #modalMapWrapper { height: 300px; }
-  td:first-child { line-height: 1.4; white-space: normal; }
-  td .main-date { display: block; } 
+  #modalMapWrapper { height: 300px; } 
 }
 @media (max-width: 480px) {
   body { padding: 10px; }
@@ -366,7 +393,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     pageEntries.forEach(entry => {
       const tr = document.createElement("tr"); tr.dataset.entryId = entry.id;
       tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`;
-      tr.innerHTML = `<td><span class="main-date">${new Date(entry.timestamp).toLocaleDateString()}</span><span class="time-ago">${formatTimeAgo(entry.timestamp)}</span></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
+      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} <span class="time-ago">(${formatTimeAgo(entry.timestamp)})</span></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
       fragment.appendChild(tr);
     });
     UIElements.tableBody.appendChild(fragment);
@@ -535,9 +562,17 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function checkTableScroll() {
-      const hasScroll = UIElements.tableContainer.scrollWidth > UIElements.tableContainer.clientWidth;
-      if (hasScroll) UIElements.tableContainer.classList.add('is-scrollable');
-      else UIElements.tableContainer.classList.remove('is-scrollable');
+      const container = UIElements.tableContainer;
+      const hasScroll = container.scrollWidth > container.clientWidth;
+      if (hasScroll) {
+          container.classList.add('is-scrollable');
+          // Use a timeout to ensure the class is applied before adding the show-indicator class,
+          // allowing the CSS transition to work properly.
+          setTimeout(() => container.classList.add('show-indicator'), 50);
+      } else {
+          container.classList.remove('show-indicator');
+          container.classList.remove('is-scrollable');
+      }
   }
 
   function exportToCSV() {

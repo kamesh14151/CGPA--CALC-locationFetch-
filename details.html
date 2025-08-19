@@ -43,29 +43,29 @@ body.light-theme {
   --shadow-color-light: rgba(0, 0, 0, 0.05);
 }
 * { box-sizing: border-box; }
-body { 
-  font-family: var(--font-family); 
-  margin: 0; 
-  padding: 20px; 
-  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); 
-  color: var(--text-color); 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-  min-height: 100vh; 
-  transition: background 0.5s ease, color 0.5s ease; 
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  transition: background 0.5s ease, color 0.5s ease;
 }
-.container { 
-  width: 100%; 
-  max-width: 900px; 
-  background: var(--container-bg); 
+.container {
+  width: 100%;
+  max-width: 900px;
+  background: var(--container-bg);
   padding: clamp(15px, 4vw, 25px);
-  border-radius: var(--border-radius-main); 
-  backdrop-filter: blur(20px); 
-  border: 1px solid var(--border-color); 
-  box-shadow: 0 8px 32px 0 var(--shadow-color); 
-  transition: all 0.5s ease; 
+  border-radius: var(--border-radius-main);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px 0 var(--shadow-color);
+  transition: all 0.5s ease;
 }
 .header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 20px; }
 .header-center { text-align: center; }
@@ -86,12 +86,27 @@ input:checked + .slider:before { transform: translateX(26px); }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 
-/* --- HORIZONTAL SCROLLING TABLE --- */
-.table-container { 
-  width: 100%; 
-  overflow-x: auto; 
-  position: relative; 
+/* --- HORIZONTAL SCROLLING TABLE (UPDATED) --- */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+/* VISIBLE SCROLLBAR FOR BETTER UX ON MOBILE */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+.table-container::-webkit-scrollbar-track {
+  background: var(--header-bg);
+  border-radius: 4px;
+}
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--desktop-indicator);
+  border-radius: 4px;
+}
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--mobile-indicator);
 }
 .table-container.is-scrollable::after {
   content: 'scroll →';
@@ -100,7 +115,8 @@ input:checked + .slider:before { transform: translateX(26px); }
   right: 0;
   bottom: 0;
   width: 80px;
-  background: linear-gradient(to left, var(--bg-gradient-end) 60%, transparent);
+  /* UPDATED GRADIENT FOR BETTER VISIBILITY */
+  background: linear-gradient(to left, var(--bg-gradient-end) 30%, transparent);
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -118,7 +134,13 @@ input:checked + .slider:before { transform: translateX(26px); }
 }
 @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+/* UPDATED TABLE CSS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 750px; /* INCREASED to force scrolling on more devices */
+  table-layout: auto; /* Ensures columns fit content */
+}
 th { background: var(--header-bg); cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
@@ -162,14 +184,14 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 #error-message { color: var(--error-color); margin-top: 15px; font-weight: 500; height: 20px; visibility: hidden; text-align: center; }
 
 @media (max-width: 920px) { .header { grid-template-columns: 1fr auto; } .header-left { display: none; } }
-@media (max-width: 700px) { 
-  .header { grid-template-columns: 1fr; gap: 15px; } 
-  .header-right { justify-content: center; } 
-  #dashboard { grid-template-columns: 1fr 1fr; } 
-  .controls-header { flex-direction: column; align-items: stretch; } 
-  .filters-container { flex-direction: column; } 
+@media (max-width: 700px) {
+  .header { grid-template-columns: 1fr; gap: 15px; }
+  .header-right { justify-content: center; }
+  #dashboard { grid-template-columns: 1fr 1fr; }
+  .controls-header { flex-direction: column; align-items: stretch; }
+  .filters-container { flex-direction: column; }
   .modal-content { padding: 15px; }
-  #modalMapWrapper { height: 300px; } 
+  #modalMapWrapper { height: 300px; }
 }
 @media (max-width: 480px) {
   body { padding: 10px; }
@@ -235,7 +257,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       <button id="nextBtn">Next</button>
     </div>
   </main>
-  
+
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
@@ -260,11 +282,11 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-  
+
   const firebaseConfig = { apiKey: "AIzaSyCxMU9PstROo2hYxwiAFsSacjJOSPCN6Ag", authDomain: "livelocationtracker-bcd3d.firebaseapp.com", databaseURL: "https://livelocationtracker-bcd3d-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "livelocationtracker-bcd3d", storageBucket: "livelocationtracker-bcd3d.appspot.com", messagingSenderId: "800051113276", appId: "1:800051113276:web:61f0162a9e95aba9cb4239" };
-  
+
   let state = {
-    allEntries: [], filteredEntries: [], currentPage: 1, entriesPerPage: 15, 
+    allEntries: [], filteredEntries: [], currentPage: 1, entriesPerPage: 15,
     map: null, mapMarker: null, mapJourneyLine: null, currentLayer: null, mapLoaderTimeout: null,
     sortColumn: 'timestamp', sortDirection: 'desc'
   };
@@ -313,7 +335,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     fetchAndRenderData(db);
     updateSortIcons();
   }
-  
+
   async function fetchAreaName(lat, lon) {
     const areaSpan = document.querySelector('#area-lookup'); if (!areaSpan) return;
     try {
@@ -430,7 +452,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     }
 
     UIElements.modalDetails.innerHTML = `<h4>Device & OS</h4><div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><h4>Location Details</h4><div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Region:</b> ${entry.region || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><h4>Network & Connection</h4><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>ISP:</b> ${entry.isp || 'N/A'}</div><div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><h4>Hardware Specs</h4><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div><div><b>CPU Cores:</b> ${entry.cpuCores || 'N/A'}</div><div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div><h4 style="margin-top:20px;">Other</h4><div><b>Saved At:</b> ${savedAtText}</div>`;
-    
+
     if (entry.gps_lat && entry.gps_lon) {
         fetchAreaName(entry.gps_lat, entry.gps_lon);
     } else {
@@ -513,7 +535,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     let popupContent = (type === 'ip') ? `<b>IP Location:</b> ${entry.ip}<br>${entry.city}, ${entry.country}` : `<b>GPS Location</b><br>Device: ${entry.device}`;
     state.mapMarker.bindPopup(popupContent).openPopup();
   }
-  
+
   function applyTheme(theme) {
     if (theme === 'light') { UIElements.body.classList.add('light-theme'); UIElements.themeToggle.checked = true; }
     else { UIElements.body.classList.remove('light-theme'); UIElements.themeToggle.checked = false; }
@@ -584,7 +606,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     link.setAttribute("download", "device_data_export.csv");
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   }
-  
+
   // --- LOGIN LOGIC ---
   document.addEventListener('DOMContentLoaded', () => {
     if (sessionStorage.getItem('isAuthenticated') === 'true') {

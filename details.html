@@ -93,60 +93,19 @@ input:checked + .slider:before { transform: translateX(26px); }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 16px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 
-/* --- TABLE STYLES (NOW MOBILE-FIRST) --- */
-.table-wrapper {
-    position: relative;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-small);
-    background: var(--header-bg);
-    overflow: hidden;
-}
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
+/* --- TABLE STYLES (MOBILE-FIRST) --- */
+.table-wrapper { position: relative; border: 1px solid var(--border-color); border-radius: var(--border-radius-small); background: var(--header-bg); overflow: hidden; }
+.table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .table-container::-webkit-scrollbar { display: none; }
-.scroll-indicator-track {
-    position: absolute;
-    bottom: 0;
-    left: 5px;
-    right: 5px;
-    height: 5px;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 3px;
-    display: none; /* Hidden by default, shown via JS on desktop */
-}
-.scroll-indicator-thumb {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-color: var(--desktop-indicator);
-    border-radius: 3px;
-}
-.table-wrapper.is-scrollable .scroll-indicator-track {
-    display: block;
-}
-table {
-  width: 100%; /* Table now fits container by default */
-  border-collapse: collapse;
-}
-
+.scroll-indicator-track { position: absolute; bottom: 0; left: 5px; right: 5px; height: 5px; background-color: rgba(0,0,0,0.2); border-radius: 3px; display: none; }
+.scroll-indicator-thumb { position: absolute; top: 0; left: 0; height: 100%; background-color: var(--desktop-indicator); border-radius: 3px; }
+.table-wrapper.is-scrollable .scroll-indicator-track { display: block; }
+table { width: 100%; border-collapse: collapse; }
 th { background: transparent; cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
 th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
-/* FIX: Text wraps by default, and padding is adjusted for mobile */
-th, td {
-  padding: 12px 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 14px;
-  white-space: normal; /* This allows text to wrap, fitting content on mobile */
-  word-break: break-word; /* Helps break long words if necessary */
-}
+th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: normal; word-break: break-word; }
 .time-ago { color: var(--text-color-muted); font-size: 0.85em; display: block; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
@@ -188,18 +147,10 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 #error-message { color: var(--error-color); margin-top: 15px; font-weight: 500; height: 20px; visibility: hidden; text-align: center; }
 
 /* --- RESPONSIVE MEDIA QUERIES --- */
-
-/* FIX: For tablets and desktops, we re-introduce the min-width and no-wrap behavior */
 @media (min-width: 768px) {
-    table {
-        min-width: 600px;
-    }
-    th, td {
-        white-space: nowrap; /* Prevent wrapping on larger screens */
-        padding: 12px 15px; /* Restore original padding */
-    }
+    table { min-width: 600px; }
+    th, td { white-space: nowrap; padding: 12px 15px; }
 }
-
 @media (max-width: 920px) { .header { grid-template-columns: 1fr auto; } .header-left { display: none; } }
 @media (max-width: 700px) {
   .header { grid-template-columns: 1fr; gap: 15px; }
@@ -289,6 +240,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       <div class="map-toggle">
         <button id="streetBtn" class="active">Street View</button>
         <button id="satBtn">Satellite View</button>
+        <!-- NEW IP LOCATION BUTTON -->
+        <button id="ipBtn">IP Location</button>
         <button id="journeyBtn">Show Journey</button>
       </div>
       <div id="modalMapWrapper">
@@ -342,10 +295,11 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     mapLoader: document.getElementById("mapLoader"),
     streetBtn: document.getElementById("streetBtn"),
     satBtn: document.getElementById("satBtn"),
+    // ADDED IP BUTTON TO UI ELEMENTS
+    ipBtn: document.getElementById("ipBtn"),
     journeyBtn: document.getElementById("journeyBtn"),
   };
 
-  // Debounce function to prevent rapid re-filtering on every keystroke
   function debounce(func, delay) {
     let timeout;
     return function(...args) {
@@ -488,7 +442,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         browserInfo = `${result.browser.name || ''} ${result.browser.version || ''}`.trim() || 'N/A';
     }
 
-    UIElements.modalDetails.innerHTML = `<h4>Device & OS</h4><div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><h4>Location Details</h4><div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Region:</b> ${entry.region || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><h4>Network & Connection</h4><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>ISP:</b> ${entry.isp || 'N/A'}</div><div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><h4>Hardware Specs</h4><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div><div><b>CPU Cores:</b> ${entry.cpuCres || 'N/A'}</div><div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div><h4 style="margin-top:20px;">Other</h4><div><b>Saved At:</b> ${savedAtText}</div>`;
+    // ADDED IP Coords display
+    UIElements.modalDetails.innerHTML = `<h4>Device & OS</h4><div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><h4>Location Details</h4><div><b>GPS Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Region:</b> ${entry.region || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><div><b>IP Coords:</b> ${entry.ip_lat && entry.ip_lon ? `${entry.ip_lat}, ${entry.ip_lon}` : 'N/A'}</div><h4>Network & Connection</h4><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>ISP:</b> ${entry.isp || 'N/A'}</div><div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><h4>Hardware Specs</h4><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div><div><b>CPU Cores:</b> ${entry.cpuCores || 'N/A'}</div><div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div><h4 style="margin-top:20px;">Other</h4><div><b>Saved At:</b> ${savedAtText}</div>`;
 
     if (entry.gps_lat && entry.gps_lon) {
         fetchAreaName(entry.gps_lat, entry.gps_lon);
@@ -516,8 +471,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     state.map = L.map(UIElements.modalMapDiv).setView([20, 0], MAP_DEFAULTS.worldZoom);
     state.currentLayer = TILE_LAYERS.street.addTo(state.map);
     state.currentLayer.on('load', () => UIElements.mapLoader.style.display = 'none');
+    // Set initial marker based on GPS, will be moved by switchMapView
     state.mapMarker = L.marker([entry.gps_lat || 0, entry.gps_lon || 0]).addTo(state.map);
-    setTimeout(() => { switchMapView('street', entry); }, 500);
+    setTimeout(() => { switchMapView('street', entry); }, 500); // Default to GPS street view
     setupMapControls(entry);
   }
 
@@ -526,28 +482,47 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   function setupMapControls(entry) {
     UIElements.streetBtn.onclick = () => switchMapView('street', entry);
     UIElements.satBtn.onclick = () => switchMapView('satellite', entry);
+    // ADDED onlick for IP button
+    UIElements.ipBtn.onclick = () => switchMapView('ip', entry);
     UIElements.journeyBtn.onclick = () => drawDeviceJourney(entry);
   }
 
+  // UPDATED switchMapView to handle IP location
   function switchMapView(viewType, entry) {
     clearJourneyLine();
     UIElements.mapLoader.style.display = 'block';
     if(state.map && state.map.hasLayer(state.currentLayer)) state.map.removeLayer(state.currentLayer);
     clearTimeout(state.mapLoaderTimeout);
     state.mapLoaderTimeout = setTimeout(() => UIElements.mapLoader.style.display = 'none', MAP_DEFAULTS.loaderFailsafe);
-    let lat, lon, zoom, newLayer;
-    const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.journeyBtn];
+    
+    let lat, lon, zoom, newLayer, popupType;
+    const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn, UIElements.journeyBtn];
     buttons.forEach(btn => btn.classList.remove('active'));
 
-    lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
-    newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
-    (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active');
+    if (viewType === 'ip') {
+        if (!entry.ip_lat || !entry.ip_lon) {
+            alert("IP address location data is not available for this entry.");
+            UIElements.mapLoader.style.display = 'none';
+            // Reactivate the previous button if possible, or a default
+            UIElements.streetBtn.classList.add('active');
+            return;
+        }
+        lat = entry.ip_lat; lon = entry.ip_lon; zoom = MAP_DEFAULTS.ipZoom;
+        newLayer = TILE_LAYERS.street;
+        UIElements.ipBtn.classList.add('active');
+        popupType = 'ip';
+    } else { // Handles 'street' and 'satellite'
+        lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
+        newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
+        (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active');
+        popupType = 'gps';
+    }
 
     state.currentLayer = newLayer.addTo(state.map);
     state.currentLayer.on('load', () => UIElements.mapLoader.style.display = 'none');
     state.map.flyTo([lat, lon], zoom);
     state.mapMarker.setLatLng([lat, lon]);
-    updateMarkerPopup('gps', entry);
+    updateMarkerPopup(popupType, entry);
   }
 
   function drawDeviceJourney(currentEntry) {
@@ -555,7 +530,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     if (!currentEntry || !currentEntry.device) { return; }
     const journeyEntries = state.allEntries.filter(e => e.device === currentEntry.device && e.gps_lat && e.gps_lon).sort((a, b) => a.timestamp - b.timestamp);
     if (journeyEntries.length < 2) { alert("Not enough location points to draw a journey."); return; }
-    [UIElements.streetBtn, UIElements.satBtn].forEach(btn => btn.classList.remove('active'));
+    [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn].forEach(btn => btn.classList.remove('active'));
     UIElements.journeyBtn.classList.add('active');
     const journeyCoords = journeyEntries.map(e => [parseFloat(e.gps_lat), parseFloat(e.gps_lon)]);
     state.mapJourneyLine = L.polyline(journeyCoords, { color: 'var(--mobile-indicator)', weight: 3 }).addTo(state.map);
@@ -565,8 +540,14 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     updateMarkerPopup('gps', currentEntry);
   }
 
+  // UPDATED marker popup to show different text for IP vs GPS
   function updateMarkerPopup(type, entry) {
-    let popupContent = `<b>GPS Location</b><br>Device: ${entry.device}`;
+    let popupContent = '';
+    if (type === 'ip') {
+        popupContent = `<b>IP-Based Location</b><br>${entry.city}, ${entry.region}<br>(Approximate)`;
+    } else { // 'gps'
+        popupContent = `<b>GPS Location</b><br>Device: ${entry.device}`;
+    }
     state.mapMarker.bindPopup(popupContent).openPopup();
   }
 
@@ -640,8 +621,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function exportToCSV() {
-    const headers = ['Timestamp', 'Device', 'CGPA', 'Battery', 'Timezone', 'IP Address', 'City', 'Region', 'Country', 'ISP', 'GPS Latitude', 'GPS Longitude', 'User Agent', 'Screen Resolution', 'CPU Cores', 'RAM (GB)', 'Connection Type'];
-    const rows = state.filteredEntries.map(e => [ `"${new Date(e.timestamp).toLocaleString()}"`, `"${e.device || ''}"`, `"${e.cgpa || ''}"`, `"${e.battery || ''}"`, `"${e.timezone || ''}"`, `"${e.ip || ''}"`, `"${e.city || ''}"`, `"${e.region || ''}"`, `"${e.country || ''}"`, `"${e.isp || ''}"`, `"${e.gps_lat || ''}"`, `"${e.gps_lon || ''}"`, `"${e.userAgent ? e.userAgent.replace(/"/g, '""') : ''}"`, `"${e.screenResolution || ''}"`, `"${e.cpuCores || ''}"`, `"${e.deviceMemory || ''}"`, `"${e.connectionType || ''}"` ].join(','));
+    const headers = ['Timestamp', 'Device', 'CGPA', 'Battery', 'Timezone', 'IP Address', 'City', 'Region', 'Country', 'ISP', 'GPS Latitude', 'GPS Longitude', 'IP Latitude', 'IP Longitude', 'User Agent', 'Screen Resolution', 'CPU Cores', 'RAM (GB)', 'Connection Type'];
+    const rows = state.filteredEntries.map(e => [ `"${new Date(e.timestamp).toLocaleString()}"`, `"${e.device || ''}"`, `"${e.cgpa || ''}"`, `"${e.battery || ''}"`, `"${e.timezone || ''}"`, `"${e.ip || ''}"`, `"${e.city || ''}"`, `"${e.region || ''}"`, `"${e.country || ''}"`, `"${e.isp || ''}"`, `"${e.gps_lat || ''}"`, `"${e.gps_lon || ''}"`, `"${e.ip_lat || ''}"`, `"${e.ip_lon || ''}"`, `"${e.userAgent ? e.userAgent.replace(/"/g, '""') : ''}"`, `"${e.screenResolution || ''}"`, `"${e.cpuCores || ''}"`, `"${e.deviceMemory || ''}"`, `"${e.connectionType || ''}"` ].join(','));
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\n' + rows.join('\n');
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));

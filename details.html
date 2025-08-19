@@ -86,24 +86,23 @@ input:checked + .slider:before { transform: translateX(26px); }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 
-/* --- HORIZONTAL SCROLLING TABLE (NEW & IMPROVED) --- */
+/* --- HORIZONTAL SCROLLING TABLE --- */
 .table-wrapper {
     position: relative;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-small);
     background: var(--header-bg);
-    padding-bottom: 10px; /* Space for the scrollbar track */
-    overflow: hidden; /* Hide the native scrollbar */
+    padding-bottom: 10px;
+    overflow: hidden;
 }
 .table-container {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  /* Hide the actual scrollbar, we will use a custom one */
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 .table-container::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+  display: none;
 }
 .scroll-indicator-track {
     position: absolute;
@@ -113,7 +112,7 @@ input:checked + .slider:before { transform: translateX(26px); }
     height: 5px;
     background-color: rgba(0,0,0,0.2);
     border-radius: 3px;
-    display: none; /* Hidden by default, shown by JS */
+    display: none;
 }
 .scroll-indicator-thumb {
     position: absolute;
@@ -125,21 +124,20 @@ input:checked + .slider:before { transform: translateX(26px); }
     transition: background-color 0.3s;
 }
 .table-wrapper.is-scrollable .scroll-indicator-track {
-    display: block; /* Show track when scrollable */
+    display: block;
 }
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* INCREASED to force scrolling on mobile */
+  min-width: 600px;
 }
-/* END OF NEW SCROLLING STYLES */
 
 th { background: transparent; cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
 th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; } /* Remove bottom border from last row */
+tbody tr:last-child td { border-bottom: none; }
 .time-ago { color: var(--text-color-muted); font-size: 0.85em; }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
 tbody tr:hover { background: var(--row-hover-bg); }
@@ -236,7 +234,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     </div>
     <div class="loader" id="mainLoader"><span></span></div>
 
-    <!-- UPDATED HTML STRUCTURE FOR SCROLLABLE TABLE -->
     <div class="table-wrapper" id="tableWrapper">
         <div class="table-container" id="tableContainer">
             <table id="entriesTable">
@@ -244,7 +241,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
                     <tr>
                         <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
                         <th data-sort="device">Device Type <span class="sort-icon"></span></th>
-                        <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
                         <th data-sort="city">City <span class="sort-icon"></span></th>
                     </tr>
                 </thead>
@@ -270,7 +266,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       <div class="map-toggle">
         <button id="streetBtn" class="active">Street View</button>
         <button id="satBtn">Satellite View</button>
-        <button id="ipBtn">IP Location</button>
         <button id="journeyBtn">Show Journey</button>
       </div>
       <div id="modalMapWrapper">
@@ -310,9 +305,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     errorMessage: document.getElementById('error-message'),
     body: document.body, themeToggle: document.getElementById('theme-checkbox'),
     dashboard: document.getElementById('dashboard'), tableHeaders: document.querySelectorAll("#entriesTable thead th"),
-    tableWrapper: document.getElementById('tableWrapper'), // New
-    tableContainer: document.getElementById('tableContainer'), // Updated ID
-    scrollThumb: document.getElementById('scrollThumb'), // New
+    tableWrapper: document.getElementById('tableWrapper'),
+    tableContainer: document.getElementById('tableContainer'),
+    scrollThumb: document.getElementById('scrollThumb'),
     tableBody: document.querySelector("#entriesTable tbody"), loader: document.getElementById("mainLoader"),
     deviceFilter: document.getElementById("deviceFilter"), cityFilter: document.getElementById("cityFilter"),
     exportBtn: document.getElementById("exportBtn"), prevBtn: document.getElementById("prevBtn"),
@@ -324,7 +319,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     mapLoader: document.getElementById("mapLoader"),
     streetBtn: document.getElementById("streetBtn"),
     satBtn: document.getElementById("satBtn"),
-    ipBtn: document.getElementById("ipBtn"),
     journeyBtn: document.getElementById("journeyBtn"),
   };
 
@@ -376,7 +370,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       return deviceMatch && cityMatch;
     });
     sortData();
-    state.currentPage = 1; // Reset to page 1 on filter
+    state.currentPage = 1;
     renderAll();
   }
 
@@ -396,7 +390,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     updateDashboardStats(state.filteredEntries);
     renderTable();
     renderPagination();
-    checkTableScroll(); // This will now manage the custom scrollbar
+    checkTableScroll();
   }
 
   function updateDashboardStats(entries) {
@@ -423,7 +417,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     pageEntries.forEach(entry => {
       const tr = document.createElement("tr"); tr.dataset.entryId = entry.id;
       tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`;
-      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} <span class="time-ago">(${formatTimeAgo(entry.timestamp)})</span></td><td>${entry.device || 'N/A'}</td><td>${entry.ip || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
+      // UPDATED: Removed IP address from this line
+      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} <span class="time-ago">(${formatTimeAgo(entry.timestamp)})</span></td><td>${entry.device || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
       fragment.appendChild(tr);
     });
     UIElements.tableBody.appendChild(fragment);
@@ -440,7 +435,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function showNoDataMessage(message = "No shared details found.") {
-    UIElements.tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">${message}</td></tr>`;
+    // UPDATED: Colspan is now 3
+    UIElements.tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">${message}</td></tr>`;
     updateDashboardStats([]); renderPagination();
   }
 
@@ -459,6 +455,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         browserInfo = `${result.browser.name || ''} ${result.browser.version || ''}`.trim() || 'N/A';
     }
 
+    // UNCHANGED: IP Address is still shown here
     UIElements.modalDetails.innerHTML = `<h4>Device & OS</h4><div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><h4>Location Details</h4><div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Region:</b> ${entry.region || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><h4>Network & Connection</h4><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>ISP:</b> ${entry.isp || 'N/A'}</div><div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><h4>Hardware Specs</h4><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div><div><b>CPU Cores:</b> ${entry.cpuCores || 'N/A'}</div><div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div><h4 style="margin-top:20px;">Other</h4><div><b>Saved At:</b> ${savedAtText}</div>`;
 
     if (entry.gps_lat && entry.gps_lon) {
@@ -495,7 +492,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   function setupMapControls(entry) {
     UIElements.streetBtn.onclick = () => switchMapView('street', entry);
     UIElements.satBtn.onclick = () => switchMapView('satellite', entry);
-    UIElements.ipBtn.onclick = () => switchMapView('ip', entry);
     UIElements.journeyBtn.onclick = () => drawDeviceJourney(entry);
   }
 
@@ -506,22 +502,18 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     clearTimeout(state.mapLoaderTimeout);
     state.mapLoaderTimeout = setTimeout(() => UIElements.mapLoader.style.display = 'none', MAP_DEFAULTS.loaderFailsafe);
     let lat, lon, zoom, newLayer;
-    const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn, UIElements.journeyBtn];
+    const buttons = [UIElements.streetBtn, UIElements.satBtn, UIElements.journeyBtn];
     buttons.forEach(btn => btn.classList.remove('active'));
-    if (viewType === 'ip') {
-      lat = entry.ip_lat || 20; lon = entry.ip_lon || 0; zoom = MAP_DEFAULTS.ipZoom;
-      newLayer = TILE_LAYERS.street;
-      UIElements.ipBtn.classList.add('active');
-    } else {
-      lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
-      newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
-      (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active');
-    }
+
+    lat = entry.gps_lat || 0; lon = entry.gps_lon || 0; zoom = MAP_DEFAULTS.gpsZoom;
+    newLayer = (viewType === 'satellite') ? TILE_LAYERS.satellite : TILE_LAYERS.street;
+    (viewType === 'satellite' ? UIElements.satBtn : UIElements.streetBtn).classList.add('active');
+
     state.currentLayer = newLayer.addTo(state.map);
     state.currentLayer.on('load', () => UIElements.mapLoader.style.display = 'none');
     state.map.flyTo([lat, lon], zoom);
     state.mapMarker.setLatLng([lat, lon]);
-    updateMarkerPopup(viewType, entry);
+    updateMarkerPopup('gps', entry);
   }
 
   function drawDeviceJourney(currentEntry) {
@@ -529,7 +521,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     if (!currentEntry || !currentEntry.device) { return; }
     const journeyEntries = state.allEntries.filter(e => e.device === currentEntry.device && e.gps_lat && e.gps_lon).sort((a, b) => a.timestamp - b.timestamp);
     if (journeyEntries.length < 2) { alert("Not enough location points to draw a journey."); return; }
-    [UIElements.streetBtn, UIElements.satBtn, UIElements.ipBtn].forEach(btn => btn.classList.remove('active'));
+    [UIElements.streetBtn, UIElements.satBtn].forEach(btn => btn.classList.remove('active'));
     UIElements.journeyBtn.classList.add('active');
     const journeyCoords = journeyEntries.map(e => [parseFloat(e.gps_lat), parseFloat(e.gps_lon)]);
     state.mapJourneyLine = L.polyline(journeyCoords, { color: 'var(--mobile-indicator)', weight: 3 }).addTo(state.map);
@@ -540,7 +532,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function updateMarkerPopup(type, entry) {
-    let popupContent = (type === 'ip') ? `<b>IP Location:</b> ${entry.ip}<br>${entry.city}, ${entry.country}` : `<b>GPS Location</b><br>Device: ${entry.device}`;
+    let popupContent = `<b>GPS Location</b><br>Device: ${entry.device}`;
     state.mapMarker.bindPopup(popupContent).openPopup();
   }
 
@@ -577,7 +569,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         sortData(); renderAll(); updateSortIcons();
       });
     });
-    // New/Updated listeners for custom scrollbar
     window.addEventListener('resize', checkTableScroll);
     UIElements.tableContainer.addEventListener('scroll', updateScrollThumb);
   }
@@ -593,13 +584,12 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     });
   }
   
-  // --- NEW SCROLL HANDLING LOGIC ---
   function checkTableScroll() {
       const container = UIElements.tableContainer;
       const hasScroll = container.scrollWidth > container.clientWidth;
       if (hasScroll) {
           UIElements.tableWrapper.classList.add('is-scrollable');
-          updateScrollThumb(); // Initial position
+          updateScrollThumb();
       } else {
           UIElements.tableWrapper.classList.remove('is-scrollable');
       }
@@ -610,8 +600,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       const thumb = UIElements.scrollThumb;
 
       const scrollableWidth = container.scrollWidth - container.clientWidth;
-      const scrollPercentage = (container.scrollLeft / scrollableWidth) * 100;
-      
+      if (scrollableWidth <= 0) return; // Avoid division by zero
+
       const thumbWidth = (container.clientWidth / container.scrollWidth) * 100;
       const thumbPosition = (container.scrollLeft / container.scrollWidth) * 100;
 
@@ -620,6 +610,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function exportToCSV() {
+    // UNCHANGED: IP Address is still included in the export
     const headers = ['Timestamp', 'Device', 'CGPA', 'Battery', 'Timezone', 'IP Address', 'City', 'Region', 'Country', 'ISP', 'GPS Latitude', 'GPS Longitude', 'User Agent', 'Screen Resolution', 'CPU Cores', 'RAM (GB)', 'Connection Type'];
     const rows = state.filteredEntries.map(e => [ `"${new Date(e.timestamp).toLocaleString()}"`, `"${e.device || ''}"`, `"${e.cgpa || ''}"`, `"${e.battery || ''}"`, `"${e.timezone || ''}"`, `"${e.ip || ''}"`, `"${e.city || ''}"`, `"${e.region || ''}"`, `"${e.country || ''}"`, `"${e.isp || ''}"`, `"${e.gps_lat || ''}"`, `"${e.gps_lon || ''}"`, `"${e.userAgent ? e.userAgent.replace(/"/g, '""') : ''}"`, `"${e.screenResolution || ''}"`, `"${e.cpuCores || ''}"`, `"${e.deviceMemory || ''}"`, `"${e.connectionType || ''}"` ].join(','));
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\n' + rows.join('\n');

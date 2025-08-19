@@ -86,71 +86,66 @@ input:checked + .slider:before { transform: translateX(26px); }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
 .filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 
-/* --- HORIZONTAL SCROLLING TABLE (UPDATED) --- */
+/* --- HORIZONTAL SCROLLING TABLE (NEW & IMPROVED) --- */
+.table-wrapper {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    background: var(--header-bg);
+    padding-bottom: 10px; /* Space for the scrollbar track */
+    overflow: hidden; /* Hide the native scrollbar */
+}
 .table-container {
   width: 100%;
   overflow-x: auto;
-  position: relative;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Hide the actual scrollbar, we will use a custom one */
+  scrollbar-width: none; /* Firefox */
 }
-/* VISIBLE SCROLLBAR FOR BETTER UX ON MOBILE */
 .table-container::-webkit-scrollbar {
-  height: 8px;
+  display: none; /* Safari and Chrome */
 }
-.table-container::-webkit-scrollbar-track {
-  background: var(--header-bg);
-  border-radius: 4px;
+.scroll-indicator-track {
+    position: absolute;
+    bottom: 0;
+    left: 5px;
+    right: 5px;
+    height: 5px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+    display: none; /* Hidden by default, shown by JS */
 }
-.table-container::-webkit-scrollbar-thumb {
-  background: var(--desktop-indicator);
-  border-radius: 4px;
+.scroll-indicator-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: var(--desktop-indicator);
+    border-radius: 3px;
+    transition: background-color 0.3s;
 }
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: var(--mobile-indicator);
+.table-wrapper.is-scrollable .scroll-indicator-track {
+    display: block; /* Show track when scrollable */
 }
-.table-container.is-scrollable::after {
-  content: 'scroll →';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 80px;
-  /* UPDATED GRADIENT FOR BETTER VISIBILITY */
-  background: linear-gradient(to left, var(--bg-gradient-end) 30%, transparent);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 10px;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--text-color-muted);
-  animation: pulse 2.5s infinite;
-  opacity: 0; /* Hidden by default, shown by JS */
-  transition: opacity 0.3s;
-}
-.table-container.is-scrollable.show-indicator::after {
-    opacity: 1;
-}
-@keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
-
-/* UPDATED TABLE CSS */
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 750px; /* INCREASED to force scrolling on more devices */
-  table-layout: auto; /* Ensures columns fit content */
+  min-width: 800px; /* INCREASED to force scrolling on mobile */
 }
-th { background: var(--header-bg); cursor: pointer; user-select: none; transition: background-color 0.2s; }
+/* END OF NEW SCROLLING STYLES */
+
+th { background: transparent; cursor: pointer; user-select: none; transition: background-color 0.2s; }
 th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
 th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; } /* Remove bottom border from last row */
 .time-ago { color: var(--text-color-muted); font-size: 0.85em; }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
 tbody tr:hover { background: var(--row-hover-bg); }
 tr.mobile { border-left: 4px solid var(--mobile-indicator); }
 tr.desktop { border-left: 4px solid var(--desktop-indicator); }
+
 .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
 .button, .pagination-container button, .map-toggle button, .export-btn { padding: 10px 18px; border: none; border-radius: var(--border-radius-small); cursor: pointer; font-weight: 600; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; text-decoration: none; display: inline-block; text-align: center; }
 .pagination-container button:disabled { background: var(--header-bg); color: var(--disabled-color); cursor: not-allowed; transform: none; box-shadow: none; }
@@ -172,7 +167,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 #app-wrapper.is-showing { animation: fadeIn 0.6s ease-out forwards; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to: { opacity: 1; transform: scale(1); } }
 
 /* --- LOGIN STYLES --- */
 #login-wrapper { max-width: 400px; width: 100%; }
@@ -240,17 +235,27 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         <button class="export-btn" id="exportBtn">Export to CSV</button>
     </div>
     <div class="loader" id="mainLoader"><span></span></div>
-    <div class="table-container">
-      <table id="entriesTable">
-        <thead><tr>
-            <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
-            <th data-sort="device">Device Type <span class="sort-icon"></span></th>
-            <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
-            <th data-sort="city">City <span class="sort-icon"></span></th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- UPDATED HTML STRUCTURE FOR SCROLLABLE TABLE -->
+    <div class="table-wrapper" id="tableWrapper">
+        <div class="table-container" id="tableContainer">
+            <table id="entriesTable">
+                <thead>
+                    <tr>
+                        <th data-sort="timestamp">Date / Time <span class="sort-icon"></span></th>
+                        <th data-sort="device">Device Type <span class="sort-icon"></span></th>
+                        <th data-sort="ip">IP Address <span class="sort-icon"></span></th>
+                        <th data-sort="city">City <span class="sort-icon"></span></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="scroll-indicator-track">
+            <div class="scroll-indicator-thumb" id="scrollThumb"></div>
+        </div>
     </div>
+    
     <div class="pagination-container">
       <button id="prevBtn">Previous</button>
       <span id="pageInfo"></span>
@@ -305,7 +310,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     errorMessage: document.getElementById('error-message'),
     body: document.body, themeToggle: document.getElementById('theme-checkbox'),
     dashboard: document.getElementById('dashboard'), tableHeaders: document.querySelectorAll("#entriesTable thead th"),
-    tableContainer: document.querySelector('.table-container'),
+    tableWrapper: document.getElementById('tableWrapper'), // New
+    tableContainer: document.getElementById('tableContainer'), // Updated ID
+    scrollThumb: document.getElementById('scrollThumb'), // New
     tableBody: document.querySelector("#entriesTable tbody"), loader: document.getElementById("mainLoader"),
     deviceFilter: document.getElementById("deviceFilter"), cityFilter: document.getElementById("cityFilter"),
     exportBtn: document.getElementById("exportBtn"), prevBtn: document.getElementById("prevBtn"),
@@ -369,6 +376,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       return deviceMatch && cityMatch;
     });
     sortData();
+    state.currentPage = 1; // Reset to page 1 on filter
     renderAll();
   }
 
@@ -388,7 +396,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     updateDashboardStats(state.filteredEntries);
     renderTable();
     renderPagination();
-    checkTableScroll();
+    checkTableScroll(); // This will now manage the custom scrollbar
   }
 
   function updateDashboardStats(entries) {
@@ -569,7 +577,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         sortData(); renderAll(); updateSortIcons();
       });
     });
+    // New/Updated listeners for custom scrollbar
     window.addEventListener('resize', checkTableScroll);
+    UIElements.tableContainer.addEventListener('scroll', updateScrollThumb);
   }
 
   function updateSortIcons() {
@@ -582,19 +592,31 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
       } else { icon.textContent = ''; }
     });
   }
-
+  
+  // --- NEW SCROLL HANDLING LOGIC ---
   function checkTableScroll() {
       const container = UIElements.tableContainer;
       const hasScroll = container.scrollWidth > container.clientWidth;
       if (hasScroll) {
-          container.classList.add('is-scrollable');
-          // Use a timeout to ensure the class is applied before adding the show-indicator class,
-          // allowing the CSS transition to work properly.
-          setTimeout(() => container.classList.add('show-indicator'), 50);
+          UIElements.tableWrapper.classList.add('is-scrollable');
+          updateScrollThumb(); // Initial position
       } else {
-          container.classList.remove('show-indicator');
-          container.classList.remove('is-scrollable');
+          UIElements.tableWrapper.classList.remove('is-scrollable');
       }
+  }
+
+  function updateScrollThumb() {
+      const container = UIElements.tableContainer;
+      const thumb = UIElements.scrollThumb;
+
+      const scrollableWidth = container.scrollWidth - container.clientWidth;
+      const scrollPercentage = (container.scrollLeft / scrollableWidth) * 100;
+      
+      const thumbWidth = (container.clientWidth / container.scrollWidth) * 100;
+      const thumbPosition = (container.scrollLeft / container.scrollWidth) * 100;
+
+      thumb.style.width = `${thumbWidth}%`;
+      thumb.style.left = `${thumbPosition}%`;
   }
 
   function exportToCSV() {

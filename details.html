@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shared Device Details - AJ STUDIOZ</title>
+<!-- Meta tags for better mobile "Add to Home Screen" experience -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Please replace 'icon.png' with the actual path to your app icon -->
+<link rel="apple-touch-icon" href="icon.png">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,6 +61,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   transition: background 0.5s ease, color 0.5s ease;
+  touch-action: manipulation; /* Improves touch responsiveness */
 }
 .container {
   width: 100%;
@@ -84,7 +91,7 @@ input:checked + .slider:before { transform: translateX(26px); }
 .stat-card p { margin: 5px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--mobile-indicator); }
 .controls-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
 .filters-container { display: flex; gap: 15px; flex-grow: 1; }
-.filters-container input { width: 100%; padding: 10px 15px; font-size: 14px; background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
+.filters-container input { width: 100%; padding: 10px 15px; font-size: 16px; /* Prevents iOS auto-zoom */ background-color: var(--header-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-small); color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; }
 
 /* --- HORIZONTAL SCROLLING TABLE --- */
 .table-wrapper {
@@ -98,11 +105,11 @@ input:checked + .slider:before { transform: translateX(26px); }
 .table-container {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* Momentum scrolling for iOS */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 .table-container::-webkit-scrollbar {
-  display: none;
+  display: none; /* Hide scrollbar for Chrome/Safari */
 }
 .scroll-indicator-track {
     position: absolute;
@@ -137,8 +144,10 @@ th:hover { background: var(--row-hover-bg); }
 th .sort-icon { margin-left: 8px; opacity: 0.6; display: inline-block; width: 1ch; }
 th.sorted-asc .sort-icon, th.sorted-desc .sort-icon { opacity: 1; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; white-space: nowrap; }
+/* Allow first column to wrap for better mobile readability */
+td:first-child { white-space: normal; }
+.time-ago { color: var(--text-color-muted); font-size: 0.85em; display: block; }
 tbody tr:last-child td { border-bottom: none; }
-.time-ago { color: var(--text-color-muted); font-size: 0.85em; }
 tbody tr { transition: background-color 0.3s ease; cursor: pointer; }
 tbody tr:hover { background: var(--row-hover-bg); }
 tr.mobile { border-left: 4px solid var(--mobile-indicator); }
@@ -148,6 +157,8 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 .button, .pagination-container button, .map-toggle button, .export-btn { padding: 10px 18px; border: none; border-radius: var(--border-radius-small); cursor: pointer; font-weight: 600; transition: all 0.3s ease; background: var(--desktop-indicator); color: #fff; text-decoration: none; display: inline-block; text-align: center; }
 .pagination-container button:disabled { background: var(--header-bg); color: var(--disabled-color); cursor: not-allowed; transform: none; box-shadow: none; }
 .button:hover:not(:disabled), .pagination-container button:hover:not(:disabled), .map-toggle button:hover, .export-btn:hover { opacity: 0.85; transform: translateY(-2px); box-shadow: 0 4px 15px var(--shadow-color-light); }
+/* Added :active state for better touch feedback */
+.button:active:not(:disabled), .pagination-container button:active:not(:disabled), .map-toggle button:active, .export-btn:active { transform: translateY(0); opacity: 0.9; box-shadow: none; }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow-y: auto; background: rgba(0, 0, 0, 0.7); animation: fadeIn 0.4s; padding: 20px; }
 .modal-content { background: var(--container-bg); backdrop-filter: blur(10px); margin: auto; padding: 25px; border-radius: var(--border-radius-main); width: 100%; max-width: 950px; color: var(--text-color); position: relative; border: 1px solid var(--border-color); animation: scaleIn 0.4s ease-out; }
 .close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.3s; }
@@ -155,7 +166,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 #modalDetails { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 15px; }
 #modalDetails h4 { margin: 10px 0 5px 0; color: var(--desktop-indicator); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; grid-column: 1 / -1; }
 #modalDetails div { font-size: 14px; word-break: break-word; }
-#modalMapWrapper { position: relative; width: 100%; height: 400px; border-radius: var(--border-radius-main); margin-top: 15px; overflow: hidden; }
+#modalMapWrapper { position: relative; width: 100%; /* Responsive map height */ height: clamp(300px, 60vh, 450px); border-radius: var(--border-radius-main); margin-top: 15px; overflow: hidden; }
 #modalMap { width: 100%; height: 100%; }
 .loader { display: none; margin: 20px auto; text-align: center; }
 .loader span, #mapLoader span { display: inline-block; width: 24px; height: 24px; border: 4px solid var(--loader-color); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
@@ -171,7 +182,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 #login-wrapper { max-width: 400px; width: 100%; }
 .login-form-group { margin-bottom: 20px; text-align: left; }
 .login-form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color-muted); }
-.login-form-group input { width: 100%; padding: 12px 15px; font-size: 16px; background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; box-sizing: border-box; }
+.login-form-group input { width: 100%; padding: 12px 15px; font-size: 16px; /* Prevents auto-zoom on focus in iOS */ background-color: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-family); transition: all 0.3s; box-sizing: border-box; }
 .login-form-group input:focus { outline: none; border-color: var(--desktop-indicator); box-shadow: 0 0 10px var(--desktop-indicator); }
 .login-form-group input#admin-name { background-color: rgba(0,0,0,0.4); font-weight: bold; cursor: not-allowed; }
 #error-message { color: var(--error-color); margin-top: 15px; font-weight: 500; height: 20px; visibility: hidden; text-align: center; }
@@ -184,7 +195,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   .controls-header { flex-direction: column; align-items: stretch; }
   .filters-container { flex-direction: column; }
   .modal-content { padding: 15px; }
-  #modalMapWrapper { height: 300px; }
+  /* Map height already handled by clamp(), so this is removed */
 }
 @media (max-width: 480px) {
   body { padding: 10px; }
@@ -322,10 +333,23 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     journeyBtn: document.getElementById("journeyBtn"),
   };
 
+  // Debounce function to prevent rapid re-filtering on every keystroke
+  function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+  }
+
   function showApp() {
     UIElements.loginWrapper.style.display = 'none';
     UIElements.appWrapper.style.display = 'block';
-    UIElements.appWrapper.classList.add('is-showing');
+    // Use requestAnimationFrame to ensure the display change has rendered before adding animation class
+    requestAnimationFrame(() => {
+      UIElements.appWrapper.classList.add('is-showing');
+    });
   }
 
   function initializeMainApp() {
@@ -405,7 +429,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     if (seconds < 60) return "just now"; const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes} min ago`; const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours} hr ago`; const days = Math.floor(hours / 24);
-    return `${days} day ago`;
+    return `${days} day(s) ago`;
   }
 
   function renderTable() {
@@ -417,8 +441,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     pageEntries.forEach(entry => {
       const tr = document.createElement("tr"); tr.dataset.entryId = entry.id;
       tr.className = `${entry.device?.toLowerCase().includes("mobile") ? "mobile" : "desktop"}`;
-      // UPDATED: Removed IP address from this line
-      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} <span class="time-ago">(${formatTimeAgo(entry.timestamp)})</span></td><td>${entry.device || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
+      tr.innerHTML = `<td>${new Date(entry.timestamp).toLocaleDateString()} <span class="time-ago">${formatTimeAgo(entry.timestamp)}</span></td><td>${entry.device || 'N/A'}</td><td>${entry.city || 'N/A'}</td>`;
       fragment.appendChild(tr);
     });
     UIElements.tableBody.appendChild(fragment);
@@ -435,7 +458,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function showNoDataMessage(message = "No shared details found.") {
-    // UPDATED: Colspan is now 3
     UIElements.tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">${message}</td></tr>`;
     updateDashboardStats([]); renderPagination();
   }
@@ -455,7 +477,6 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
         browserInfo = `${result.browser.name || ''} ${result.browser.version || ''}`.trim() || 'N/A';
     }
 
-    // UNCHANGED: IP Address is still shown here
     UIElements.modalDetails.innerHTML = `<h4>Device & OS</h4><div><b>Device Brand:</b> ${deviceInfo}</div><div><b>OS:</b> ${osInfo}</div><div><b>Browser:</b> ${browserInfo}</div><div><b>CGPA:</b> ${entry.cgpa || 'N/A'}</div><h4>Location Details</h4><div><b>Area:</b> <span id="area-lookup" style="font-style: italic;">Loading...</span></div><div><b>City:</b> ${entry.city || 'N/A'}</div><div><b>Region:</b> ${entry.region || 'N/A'}</div><div><b>Country:</b> ${entry.country || 'N/A'}</div><h4>Network & Connection</h4><div><b>IP Address:</b> ${entry.ip || 'N/A'}</div><div><b>ISP:</b> ${entry.isp || 'N/A'}</div><div><b>Connection:</b> ${entry.connectionType || 'N/A'}</div><div><b>Timezone:</b> ${entry.timezone || 'N/A'}</div><h4>Hardware Specs</h4><div><b>Battery:</b> ${entry.battery || 'N/A'}</div><div><b>Screen:</b> ${entry.screenResolution || 'N/A'}</div><div><b>CPU Cores:</b> ${entry.cpuCores || 'N/A'}</div><div><b>Memory (RAM):</b> ${entry.deviceMemory ? entry.deviceMemory + ' GB' : 'N/A'}</div><h4 style="margin-top:20px;">Other</h4><div><b>Saved At:</b> ${savedAtText}</div>`;
 
     if (entry.gps_lat && entry.gps_lon) {
@@ -469,10 +490,12 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   function openModal(entry) {
     populateModalDetails(entry);
     UIElements.modal.style.display = "block";
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
     initializeMap(entry);
   }
   function closeModal() {
       UIElements.modal.style.display = "none";
+      document.body.style.overflow = 'auto'; // Restore background scroll
       if (state.map) { state.map.remove(); state.map = null; }
   }
 
@@ -550,8 +573,11 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   }
 
   function setupEventListeners() {
-    UIElements.deviceFilter.addEventListener('keyup', applyFiltersAndRender);
-    UIElements.cityFilter.addEventListener('keyup', applyFiltersAndRender);
+    // Debounce the filter inputs for better performance
+    const debouncedFilter = debounce(applyFiltersAndRender, 300);
+    UIElements.deviceFilter.addEventListener('keyup', debouncedFilter);
+    UIElements.cityFilter.addEventListener('keyup', debouncedFilter);
+
     UIElements.tableBody.addEventListener('click', (event) => {
       const row = event.target.closest('tr');
       if (row && row.dataset.entryId) { const entry = state.allEntries.find(e => e.id === row.dataset.entryId); if (entry) openModal(entry); }
@@ -560,6 +586,7 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
     UIElements.nextBtn.addEventListener('click', () => { if (state.currentPage < Math.ceil(state.filteredEntries.length / state.entriesPerPage)) { state.currentPage++; renderAll(); } });
     UIElements.closeModalBtn.onclick = closeModal;
     window.onclick = (event) => { if (event.target == UIElements.modal) closeModal(); };
+    window.addEventListener('keyup', (event) => { if (event.key === 'Escape') closeModal(); }); // Close modal on escape key
     UIElements.exportBtn.addEventListener('click', exportToCSV);
     UIElements.tableHeaders.forEach(header => {
       header.addEventListener('click', () => {
@@ -587,30 +614,22 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
   function checkTableScroll() {
       const container = UIElements.tableContainer;
       const hasScroll = container.scrollWidth > container.clientWidth;
-      if (hasScroll) {
-          UIElements.tableWrapper.classList.add('is-scrollable');
-          updateScrollThumb();
-      } else {
-          UIElements.tableWrapper.classList.remove('is-scrollable');
-      }
+      UIElements.tableWrapper.classList.toggle('is-scrollable', hasScroll);
+      if (hasScroll) updateScrollThumb();
   }
 
   function updateScrollThumb() {
       const container = UIElements.tableContainer;
       const thumb = UIElements.scrollThumb;
-
       const scrollableWidth = container.scrollWidth - container.clientWidth;
-      if (scrollableWidth <= 0) return; // Avoid division by zero
-
-      const thumbWidth = (container.clientWidth / container.scrollWidth) * 100;
-      const thumbPosition = (container.scrollLeft / container.scrollWidth) * 100;
-
-      thumb.style.width = `${thumbWidth}%`;
-      thumb.style.left = `${thumbPosition}%`;
+      if (scrollableWidth <= 0) return;
+      const thumbWidthPercent = (container.clientWidth / container.scrollWidth) * 100;
+      const thumbPositionPercent = (container.scrollLeft / scrollableWidth) * (100 - thumbWidthPercent);
+      thumb.style.width = `${thumbWidthPercent}%`;
+      thumb.style.left = `${thumbPositionPercent}%`;
   }
 
   function exportToCSV() {
-    // UNCHANGED: IP Address is still included in the export
     const headers = ['Timestamp', 'Device', 'CGPA', 'Battery', 'Timezone', 'IP Address', 'City', 'Region', 'Country', 'ISP', 'GPS Latitude', 'GPS Longitude', 'User Agent', 'Screen Resolution', 'CPU Cores', 'RAM (GB)', 'Connection Type'];
     const rows = state.filteredEntries.map(e => [ `"${new Date(e.timestamp).toLocaleString()}"`, `"${e.device || ''}"`, `"${e.cgpa || ''}"`, `"${e.battery || ''}"`, `"${e.timezone || ''}"`, `"${e.ip || ''}"`, `"${e.city || ''}"`, `"${e.region || ''}"`, `"${e.country || ''}"`, `"${e.isp || ''}"`, `"${e.gps_lat || ''}"`, `"${e.gps_lon || ''}"`, `"${e.userAgent ? e.userAgent.replace(/"/g, '""') : ''}"`, `"${e.screenResolution || ''}"`, `"${e.cpuCores || ''}"`, `"${e.deviceMemory || ''}"`, `"${e.connectionType || ''}"` ].join(','));
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(',') + '\n' + rows.join('\n');
@@ -622,6 +641,9 @@ tr.desktop { border-left: 4px solid var(--desktop-indicator); }
 
   // --- LOGIN LOGIC ---
   document.addEventListener('DOMContentLoaded', () => {
+    // IMPORTANT SECURITY WARNING: Hardcoding passwords on the client-side is extremely insecure.
+    // This is for demonstration purposes only. A real application MUST use a secure authentication
+    // service like Firebase Authentication.
     if (sessionStorage.getItem('isAuthenticated') === 'true') {
         showApp();
         initializeMainApp();
